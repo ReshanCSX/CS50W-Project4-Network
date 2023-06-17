@@ -1,5 +1,32 @@
 {% extends "network/layout.html" %}
 
 {% block body %}
-    TODO
+    <div class="col-10 col-md-8 col-lg-6">
+
+        <div class="row py-3 justify-content-center border rounded m-3">
+
+            <div class="col-12 text-center">
+                <h5 class="text-muted fw-normal mb-3">New post</h5>
+            </div>
+            <form action="{% url 'createpost' %}" method="post">
+
+                {% csrf_token %}
+                
+                {% for field in createpost %}
+                <div class="col-12 mb-2">
+                    {{field}}
+                </div>
+                {% endfor %}
+                <div class="col-12 text-end mb-2">
+                    <input class="btn btn-primary" type="submit" value="Post">
+                </div>  
+            </form>
+
+        </div>
+
+        <div class="row">
+
+        </div>
+    </div>
+
 {% endblock %}
