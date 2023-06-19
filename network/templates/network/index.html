@@ -3,7 +3,8 @@
 {% block body %}
     <div class="col-10 col-md-8 col-lg-6">
 
-        <div class="row py-3 justify-content-center border rounded m-3">
+        {% if user.is_authenticated %}
+        <div class="row py-3 justify-content-center border rounded my-2">
 
             <div class="col-12 text-center">
                 <h5 class="text-muted fw-normal mb-3">New post</h5>
@@ -23,10 +24,12 @@
             </form>
 
         </div>
+        {% endif %}
 
-        <div class="row">
+        <div class="row" id="home_view">
 
         </div>
+  
     </div>
 
 {% endblock %}

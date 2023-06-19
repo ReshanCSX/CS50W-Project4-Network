@@ -5,15 +5,22 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 
-from .models import User
+from .models import User, Posts
 from .forms import CreatePost
 
 def index(request):
 
-
     return render(request, "network/index.html", {
-        "createpost" : CreatePost()
+        "createpost" : CreatePost(),
     })
+
+def load(request, page):
+    if page == "home":
+        posts = Posts.objects.all().order_by("-timestamp")
+    else:
+        return JsonResponse({"error": "Invalid mailbox."}, status=400)
+
+    return JsonResponse([post.serialize() for post in posts], safe=False)
 
 
 def login_view(request):

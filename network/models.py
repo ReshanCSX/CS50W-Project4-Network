@@ -14,6 +14,6 @@ class Posts(models.Model):
         return {
             'id': self.id,
             'post': self.post,
-            'author' : self.author,
-            'timestamp' : self.timestamp
+            'author' : self.author.username,
+            'timestamp' : self.timestamp.strftime("%b %d %Y, %I:%M %p")
         }
