@@ -56,11 +56,11 @@
                     
                         {% for page_number in page.paginator.page_range %}
                             {% if page.number|add:3 > page_number and page_number > page.number|add:-3 %}
-                                <li class="page-item {% if page.number == page_number %}active{% endif %}"><a class="page-link" href="#">{{page_number}}</a></li>
+                                <li class="page-item {% if page.number == page_number %}active{% endif %}"><a class="page-link" href="?page={{page_number}}">{{page_number}}</a></li>
                             {% endif %}
                         {% endfor %}
                     
-                    <li class="page-item {% if not page.has_next %}disabled{% endif %}"><a class="page-link"  href="?page={{ page_obj.next_page_number }}">Next</a></li>
+                    <li class="page-item {% if not page.has_next %}disabled{% endif %}"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
                 </ul>
             </nav>
         </div>
