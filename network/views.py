@@ -3,24 +3,35 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
+
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 
 from .models import User, Posts
 from .forms import CreatePost
 
 def index(request):
 
+    posts = Posts.objects.all().order_by('-timestamp')
+
+    paginator = Paginator(posts, 10)
+
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
+
+
     return render(request, "network/index.html", {
+        'page': page,
         "createpost" : CreatePost(),
     })
 
-def load(request, page):
-    if page == "home":
-        posts = Posts.objects.all().order_by("-timestamp")
-    else:
-        return JsonResponse({"error": "Invalid mailbox."}, status=400)
+# def load(request, page):
+#     if page == "home":
+#         posts = Posts.objects.all().order_by("-timestamp")
+#     else:
+#         return JsonResponse({"error": "Invalid mailbox."}, status=400)
 
-    return JsonResponse([post.serialize() for post in posts], safe=False)
+#     return JsonResponse([post.serialize() for post in posts], safe=False)
 
 
 def login_view(request):
@@ -90,4 +101,12 @@ def create(request):
         return HttpResponseRedirect(reverse("index"))
 
 
+def profile(request, username):
 
+    try:
+        user = User.objects.get(username=username)
+    except:
+        return JsonResponse({"error": "User not found."})
+
+
+    return JsonResponse({"name": user.username})
