@@ -21,7 +21,7 @@ def index(request):
 
 
     return render(request, "network/index.html", {
-        'page': page,
+        "page": page,
         "createpost" : CreatePost(),
     })
 
@@ -107,6 +107,16 @@ def profile(request, username):
         user = User.objects.get(username=username)
     except:
         return JsonResponse({"error": "User not found."})
+    
+    posts = Posts.objects.filter(author=user.id)
+    paginator = Paginator(posts, 10)
+
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
 
 
-    return JsonResponse({"name": user.username})
+
+    return render(request, "network/profile.html", {
+        "profile_data": user,
+        "page" : page
+    })

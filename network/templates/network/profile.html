@@ -1,0 +1,36 @@
+{% extends "network/layout.html" %}
+
+{% block title %}{% endblock %}
+
+{% block body %}
+
+<div class="col-10 col-md-8 col-lg-6">
+
+    <div class="container bg-white text-center p-5">
+        <div class="row"><h3 class="fw-light fs-2">{{profile_data.username}}</h3></div>
+        {{profile_data.name}}
+        {% if user.is_authenticated and user != profile_data %}
+            <div class="row justify-content-center mt-3">
+                <div class="col d-flex justify-content-center">
+                    <button class="d-flex btn btn-primary">Follow</button>
+                </div>
+            </div>
+        {% endif %}
+        <div class="row mt-3">
+            <div class="col-3 ms-auto">
+                <div class="row"><span class="small text-muted">Followers</span></div>
+                <div class="row"><span>0</span></div>
+            </div>
+            <div class="col-3 me-auto">
+                <div class="row"><span class="small text-muted">Following</span></div>
+                <div class="row"><span>0</span></div>
+            </div>
+        </div>
+    </div>
+
+    
+    {% include "network/post_section.html" %}
+
+</div>
+
+{% endblock %}

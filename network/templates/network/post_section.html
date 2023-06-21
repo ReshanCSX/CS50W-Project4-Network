@@ -1,0 +1,48 @@
+{% load humanize %}
+ 
+ <!-- Posts -->
+ {% for post in page %}
+ 
+ <div class="row" id="home_view">
+     <div class="col-12 border rounded p-3 pb-2 my-1">
+         <div class="row mb-2">
+             <div class="col-auto small text-muted"><a href="{% url 'user' post.author %}" class="text-decoration-none">{{post.author}}</a></div>
+             <div class="col-auto small text-muted">{{post.timestamp|naturaltime}}</div>
+         </div>
+
+         <div class="row mb-2">
+             <div class="col-12">{{post.post}}</div>
+         </div>
+
+         <div class="row">
+             <div class="col-auto small text-muted"><i class="bi bi-heart style="font-size: 2rem; color: cornflowerblue;"></i>  0</div>
+         </div>
+     </div>
+ </div>
+ {% empty %}
+ <div class="row" id="home_view">
+    <div class="col-12 border rounded p-3 pb-2 my-1 text-center">
+        <h5>Nothing to show yet.</h5>
+    </div>
+</div>
+
+ {% endfor %}
+ 
+ {% if page %}
+ <!-- Pagination -->
+ <div class="row my-3">
+     <nav aria-label="Page navigation">
+         <ul class="pagination justify-content-center">
+                 <li class="page-item {% if not page.has_previous %}disabled{% endif %}"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+             
+                 {% for page_number in page.paginator.page_range %}
+                     {% if page.number|add:3 > page_number and page_number > page.number|add:-3 %}
+                         <li class="page-item {% if page.number == page_number %}active{% endif %}"><a class="page-link" href="?page={{page_number}}">{{page_number}}</a></li>
+                     {% endif %}
+                 {% endfor %}
+             
+             <li class="page-item {% if not page.has_next %}disabled{% endif %}"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+         </ul>
+     </nav>
+ </div>
+ {% endif %}
