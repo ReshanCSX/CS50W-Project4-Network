@@ -3,8 +3,8 @@
  <!-- Posts -->
  {% for post in page %}
  
- <div class="row" id="home_view">
-     <div class="col-12 border rounded p-3 pb-2 my-1">
+ <div class="row mx-3 shadow-sm mt-2 border rounded p-3 pb-2" id="home_view">
+     <div class="col-12">
          <div class="row mb-2">
              <div class="col-auto small text-muted"><a href="{% url 'user' post.author %}" class="text-decoration-none">{{post.author}}</a></div>
              <div class="col-auto small text-muted">{{post.timestamp|naturaltime}}</div>
@@ -15,14 +15,14 @@
          </div>
 
          <div class="row">
-             <div class="col-auto small text-muted"><i class="bi bi-heart style="font-size: 2rem; color: cornflowerblue;"></i>  0</div>
+             <div class="col-auto small text-danger"><i class="bi bi-heart" style="color: red;"></i><span class="ms-2">0</span></div>
          </div>
      </div>
  </div>
  {% empty %}
- <div class="row" id="home_view">
-    <div class="col-12 border rounded p-3 pb-2 my-1 text-center">
-        <h5>Nothing to show yet.</h5>
+ <div class="row mx-3 shadow-sm mt-2 border rounded p-3 pb-2 my-3" id="home_view">
+    <div class="col-12 text-center">
+        <h5 class="p-5">Nothing to show yet.</h5>
     </div>
 </div>
 
@@ -37,7 +37,7 @@
              
                  {% for page_number in page.paginator.page_range %}
                      {% if page.number|add:3 > page_number and page_number > page.number|add:-3 %}
-                         <li class="page-item {% if page.number == page_number %}active{% endif %}"><a class="page-link" href="?page={{page_number}}">{{page_number}}</a></li>
+                         <li class="page-item {% if page.number == page_number %}active{% endif %}"><a class="page-link pagination-item" href="?page={{page_number}}">{{page_number}}</a></li>
                      {% endif %}
                  {% endfor %}
              

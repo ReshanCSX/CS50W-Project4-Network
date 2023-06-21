@@ -1,0 +1,53 @@
+$color-primary : #0D47A1; //Light blue 900
+$color-primary-hover : #0277BD; //Light blue 800
+$color-secondary : #009688; // Teal 500
+$color-background : #f0f0f0; // Blue Gray 400
+$color-surface : #EEEEEE; // Gray 200
+
+$color-fonts-white: #FFF; // White
+$color-fonts-gray: #B0BEC5; // gray
+
+#navbar{
+    background-color: $color-primary;
+
+    .nav-link {
+        color: $color-fonts-gray;
+
+        &:hover{
+            color: $color-fonts-white;
+        }
+    }
+
+    .active, .navbar-brand{
+        color: $color-fonts-white !important;
+    }
+}
+
+body{
+    background-color: $color-background;
+}
+
+.btn-primary,
+.btn-primary:active,
+.btn-primary:visited,
+.btn-primary:focus {
+    background-color: $color-primary !important;
+    border: 1px solid $color-primary !important;
+
+    &:hover{
+        background-color: $color-primary-hover !important;
+        border: 1px solid $color-primary-hover !important;
+    }
+}
+
+.pagination-item{
+    background-color: $color-primary !important;
+}
+
+.custom-toggler .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255,102,203, 0.5)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E");
+  }
+  
+  .custom-toggler.navbar-toggler {
+    border-color: rgb(255,102,203);
+  } 

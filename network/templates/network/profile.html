@@ -4,9 +4,9 @@
 
 {% block body %}
 
-<div class="col-10 col-md-8 col-lg-6">
+<div class="col-10 col-md-8 col-lg-8 mx-4 bg-white px-5">
 
-    <div class="container bg-white text-center p-5">
+    <div class="container text-center mt-3 p-5">
         <div class="row"><h3 class="fw-light fs-2">{{profile_data.username}}</h3></div>
         {{profile_data.name}}
         {% if user.is_authenticated and user != profile_data %}
