@@ -3,13 +3,35 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
+from django.http import JsonResponse
+import json
 
-from .models import User
+from .models import User, Posts
 
 
 def index(request):
     return render(request, "network/index.html")
 
+
+def create(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "POST request required."}, status=400)
+    
+    if request.user.is_authenticated:
+        data = json.loads(request.body)
+        content = data.get("content","")
+
+        if content == "":
+            return JsonResponse({"error": "Post cannot be empty."}, status=400)
+
+        post = Posts(
+            content=content,
+            author=request.user
+        )
+
+        post.save()
+
+        return JsonResponse({"success": "Post created."}, status=201)
 
 def login_view(request):
     if request.method == "POST":
