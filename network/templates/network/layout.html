@@ -3,11 +3,10 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>{% block title %}Social Network{% endblock %}</title>
+        <title>{% block title %}{% endblock %}Social Network</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
         <link href="{% static 'network/styles.css' %}" rel="stylesheet">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-        <script src="{% static 'network/main.js'%}"></script>
+        {% block script %}{% endblock %}
     </head>
     <body>
 
@@ -24,94 +23,42 @@
                     <li class="nav-item">
                         <a class="nav-link {% if url_name == 'index' %}active{% endif %}" aria-current="page" href="{% url 'index' %}">All Posts</a>
                     </li>
-                    {% if user.is_authenticated %}
-                        <li class="nav-item">
-                            <a class="nav-link {% if url_name == 'following' %}active{% endif %}" href="#">Following</a>
-                        </li>
-                    {% endif %}
-                </ul>
-
-                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                    {% if user.is_authenticated %}
-                        <li class="nav-item">
-                            <a class="nav-link {% if url_name == 'user' and request.user == profile_data %}active{% endif %}" href="{% url 'user' user.username %}">{{ user.username }}</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" aria-current="page" href="{% url 'logout' %}">Log Out</a>
-                        </li>
-                    {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link {% if url_name == 'login' %}active{% endif %}" aria-current="page" href="{% url 'login' %}">Log In</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if url_name == 'register' %}active{% endif %}" aria-current="page" href="{% url 'register' %}">Register</a>
-                        </li>
-                    {% endif %}
-                </ul>
-
-              </div>
-              {% endwith %}
+                {% endif %}
+                <li class="nav-item">
+                  <a class="nav-link" id="nav_home" href="{% url 'index' %}">All Posts</a>
+                </li>
+                {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" id="nav_following" href="#">Following</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">Log In</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'register' %}">Register</a>
+                    </li>
+                {% endif %}
+              </ul>
             </div>
           </nav>
-
-
-
-
-
-
-
-        <!-- <nav class="navbar navbar-expand-lg px-3" id="navbar">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="{% url 'index' %}">Network</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                {% with url_name=request.resolver_match.url_name %}
-                <div class="collapse navbar-collapse ms-3">
-
-                    <ul class="navbar-nav m-auto mb-2 mb-lg-0">
-                        <li class="nav-item mx-3">
-                            <a class="nav-link {% if url_name == 'index' %}active{% endif %}" aria-current="page" href="{% url 'index' %}">All Posts</a>
-                        </li>
-                        {% if user.is_authenticated %}
-                            <li class="nav-item mx-3">
-                                <a class="nav-link {% if url_name == 'following' %}active{% endif %}" href="#">Following</a>
-                            </li>
-                        {% endif %}
-                    </ul>
-
-                    <ul class="navbar-nav m-0 mb-2 mb-lg-0">
-                        {% if user.is_authenticated %}
-                            <li class="nav-item">
-                                <a class="nav-link {% if url_name == 'user' and request.user == profile_data %}active{% endif %}" href="{% url 'user' user.username %}">{{ user.username }}</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" aria-current="page" href="{% url 'logout' %}">Log Out</a>
-                            </li>
-                        {% else %}
-                            <li class="nav-item">
-                                <a class="nav-link {% if url_name == 'login' %}active{% endif %}" aria-current="page" href="{% url 'login' %}">Log In</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link {% if url_name == 'register' %}active{% endif %}" aria-current="page" href="{% url 'register' %}">Register</a>
-                            </li>       
-                        {% endif %}
-                    </ul>
-
-                </div>
-                {% endwith %}
-            </div>
-        </nav> -->
-
         
-        <div class="body container-fluid">
-            <div class="row justify-content-center">
-                {% block body %}
-                {% endblock %}
+        <div class="container">
+
+            <div class="alert alert-dismissible fade show text-center mt-3" role="alert" id="alert" style="display: none;">
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
+
+            {% block body %}
+            {% endblock %}
         </div>
 
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 
+        
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    
     </body>
 </html>

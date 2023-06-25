@@ -3,27 +3,22 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
-
-from django.contrib.auth.decorators import login_required
-from django.core.paginator import Paginator
+from django.http import JsonResponse
+import json
 
 from .models import User, Posts
-from .forms import CreatePost
+
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.decorators import api_view
+from .serializers import PostSerializer
+from rest_framework.parsers import JSONParser
+
+
 
 def index(request):
 
-    posts = Posts.objects.all().order_by('-timestamp')
-
-    paginator = Paginator(posts, 10)
-
-    page_number = request.GET.get('page')
-    page = paginator.get_page(page_number)
-
-
-    return render(request, "network/index.html", {
-        "page": page,
-        "createpost" : CreatePost(),
-    })
+    return render(request, "network/index.html")
 
 # def load(request, page):
 #     if page == "home":
@@ -32,6 +27,54 @@ def index(request):
 #         return JsonResponse({"error": "Invalid mailbox."}, status=400)
 
 #     return JsonResponse([post.serialize() for post in posts], safe=False)
+
+
+@api_view(['GET', 'POST'])
+def posts(request):
+
+    if request.method == "POST":
+    
+        if request.user.is_authenticated:
+
+            data = request.data.copy()
+            data.update({'author': request.user.id})
+
+            serializer = PostSerializer(data=data)
+
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        else:
+            return JsonResponse({"error": "safsaf"}, status=201)
+        
+    return JsonResponse({"error": "error"}, status=201)
+
+
+@api_view(['GET', 'POST'])
+def posts(request):
+
+    if request.method == "POST":
+    
+        if request.user.is_authenticated:
+
+            data = request.data.copy()
+            data.update({'author': request.user.id})
+
+            serializer = PostSerializer(data=data)
+
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        else:
+            return JsonResponse({"error": "safsaf"}, status=201)
+        
+    return JsonResponse({"error": "error"}, status=201)
 
 
 def login_view(request):
@@ -84,39 +127,3 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "network/register.html")
-    
-
-@login_required
-def create(request):
-
-    if request.method != "POST":
-        return JsonResponse({"error": "POST request required."}, status=400)
-    
-
-    form = CreatePost(request.POST)
-
-    if form.is_valid():
-        form.instance.author = request.user
-        form.save()
-        return HttpResponseRedirect(reverse("index"))
-
-
-def profile(request, username):
-
-    try:
-        user = User.objects.get(username=username)
-    except:
-        return JsonResponse({"error": "User not found."})
-    
-    posts = Posts.objects.filter(author=user.id)
-    paginator = Paginator(posts, 10)
-
-    page_number = request.GET.get('page')
-    page = paginator.get_page(page_number)
-
-
-
-    return render(request, "network/profile.html", {
-        "profile_data": user,
-        "page" : page
-    })

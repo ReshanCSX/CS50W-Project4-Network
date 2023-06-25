@@ -5,15 +5,14 @@ from django.db import models
 class User(AbstractUser):
     pass
 
+
 class Posts(models.Model):
-    post = models.CharField(max_length=1000)
+    content = models.CharField(max_length=1000, blank=False)
     timestamp = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey("User", on_delete=models.CASCADE, related_name="posts")
 
-    def serialize(self):
-        return {
-            'id': self.id,
-            'post': self.post,
-            'author' : self.author.username,
-            'timestamp' : self.timestamp.strftime("%b %d %Y, %I:%M %p")
-        }
+    def __str__(self):
+        return f"{self.content} by {self.author} at {self.timestamp.strftime('%b %d %Y, %I:%M %p')}"
+    
+    class Meta:
+        ordering = ['-timestamp']

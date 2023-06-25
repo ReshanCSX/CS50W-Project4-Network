@@ -1,36 +1,26 @@
 {% extends "network/layout.html" %}
-{% load humanize %}
+{% load static %}
 
 {% block body %}
-    <div class="col-10 col-md-8 col-lg-8 mx-4 bg-white px-5">
-
-        {% if user.is_authenticated %}
-        <div class="row py-3 justify-content-center border rounded mt-4 mb-3 mx-3 shadow-sm">
-
-            <div class="col-12 text-center">
-                <h5 class="text-muted fw-normal mb-3">New post</h5>
-            </div>
-            <form action="{% url 'createpost' %}" method="post">
-
-                {% csrf_token %}
-                
-                {% for field in createpost %}
-                <div class="col-12 mb-2">
-                    {{field}}
-                </div>
-                {% endfor %}
-                <div class="col-12 text-end mb-2">
-                    <input class="btn btn-primary" type="submit" value="Post">
-                </div>  
-            </form>
-
+    {% if user.is_authenticated %}
+    <div class="row p-3 bg-white justify-content-center">
+        <div class="col-12 col-md-8 col-lg-8 text-center align-self-center border rounded">
+            <h4 class="my-3">New Post</h4>
+            <textarea class="form-control mb-3" rows="3" id="post_content"></textarea>
+            <button type="submit" class="btn btn-primary mb-3 float-end" id="create_post">Post</button>
         </div>
-        {% endif %}
-
-        {% include "network/post_section.html" %}
-
-
-
     </div>
+    {% endif %}
 
+    <div class="row">
+        <div class="col">
+            
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    {% if user.is_authenticated %}
+        <script src="{% static 'network/main.js' %}" type="module"></script>
+    {% endif %}
 {% endblock %}
