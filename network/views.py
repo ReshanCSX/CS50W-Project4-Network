@@ -8,30 +8,40 @@ import json
 
 from .models import User, Posts
 
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.decorators import api_view
+from .serializers import PostSerializer
+from rest_framework.parsers import JSONParser
+
 
 def index(request):
     return render(request, "network/index.html")
 
 
-def create(request):
-    if request.method != "POST":
-        return JsonResponse({"error": "POST request required."}, status=400)
+@api_view(['GET', 'POST'])
+def posts(request):
+
+    if request.method == "POST":
     
-    if request.user.is_authenticated:
-        data = json.loads(request.body)
-        content = data.get("content","")
+        if request.user.is_authenticated:
 
-        if content == "":
-            return JsonResponse({"error": "Post cannot be empty."}, status=400)
+            data = request.data.copy()
+            data.update({'author': request.user.id})
 
-        post = Posts(
-            content=content,
-            author=request.user
-        )
+            serializer = PostSerializer(data=data)
 
-        post.save()
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        return JsonResponse({"success": "Post created."}, status=201)
+        else:
+            return JsonResponse({"error": "safsaf"}, status=201)
+        
+    return JsonResponse({"error": "error"}, status=201)
+
 
 def login_view(request):
     if request.method == "POST":

@@ -21,11 +21,11 @@
                     </li>
                 {% endif %}
                 <li class="nav-item">
-                  <a class="nav-link" href="{% url 'index' %}">All Posts</a>
+                  <a class="nav-link" id="nav_home" href="{% url 'index' %}">All Posts</a>
                 </li>
                 {% if user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Following</a>
+                        <a class="nav-link" id="nav_following" href="#">Following</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
@@ -43,6 +43,11 @@
           </nav>
         
         <div class="container">
+
+            <div class="alert alert-dismissible fade show text-center mt-3" role="alert" id="alert" style="display: none;">
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
             {% block body %}
             {% endblock %}
         </div>
