@@ -12,45 +12,12 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view
 from .serializers import PostSerializer
-from rest_framework.parsers import JSONParser
 
 
 
 def index(request):
 
     return render(request, "network/index.html")
-
-# def load(request, page):
-#     if page == "home":
-#         posts = Posts.objects.all().order_by("-timestamp")
-#     else:
-#         return JsonResponse({"error": "Invalid mailbox."}, status=400)
-
-#     return JsonResponse([post.serialize() for post in posts], safe=False)
-
-
-@api_view(['GET', 'POST'])
-def posts(request):
-
-    if request.method == "POST":
-    
-        if request.user.is_authenticated:
-
-            data = request.data.copy()
-            data.update({'author': request.user.id})
-
-            serializer = PostSerializer(data=data)
-
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-        else:
-            return JsonResponse({"error": "safsaf"}, status=201)
-        
-    return JsonResponse({"error": "error"}, status=201)
 
 
 @api_view(['GET', 'POST'])
