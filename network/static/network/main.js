@@ -2,31 +2,47 @@ import { alert, getCookie } from './utils.js';
 import { generatePost } from './generator.js';
 
 
-document.addEventListener('DOMContentLoaded', function(){
-
-    document.querySelector('#nav-active').addEventListener('click', (event) => {event.preventDefault(); loadposts(event);});
-    document.querySelector('#create_post').addEventListener('click', () => createPost());
-
-    let active_page = document.querySelector('#nav-active');
-
-    if(active_page){
-        loadposts(active_page);
-    }
-
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelector("#index").addEventListener('click', () => loadView("index"));
+    document.querySelector("#profile")?.addEventListener('click', () => loadView("profile"));
+    document.querySelector('#create_post')?.addEventListener('click', () => createPost());
+    loadView('index');
 });
 
-async function loadposts(event){
 
-    document.querySelector("#posts").innerHTML = "";
+function loadView(page){
 
-    let page = "All Posts";
+    let homeview = document.querySelector("#home-view");
+    let profileview = document.querySelector("#profile-view");
 
-    if (event.innerHTML === 'All Posts'){
-        page = "/posts"
+    homeview.style.display = 'none';
+    profileview.style.display = 'none';
+
+    if (page === "profile"){
+        homeview.style.display = 'none';
+        profileview.style.display = 'block';
+
+    } else if(page === "index"){
+        homeview.style.display = 'block';
+        profileview.style.display = 'none';
+
+        loadPosts("index")
     }
 
+}
+
+
+async function loadPosts(page){
+
+    let url
+
+    if (page === 'index'){
+        url = '/posts'
+    }
+
+
     try{
-        const request = await fetch(page);
+        const request = await fetch(url);
         const response = await request.json();
         console.log(response)
 
