@@ -1,25 +1,48 @@
 import { alert, getCookie } from './utils.js';
+import { generatePost } from './generator.js';
 
 
 document.addEventListener('DOMContentLoaded', function(){
-    // document.querySelector('#nav_home').addEventListener('click', () => loadposts(index))
+
+    document.querySelector('#nav-active').addEventListener('click', (event) => {event.preventDefault(); loadposts(event);});
     document.querySelector('#create_post').addEventListener('click', () => createPost());
+
+    let active_page = document.querySelector('#nav-active');
+
+    if(active_page){
+        loadposts(active_page);
+    }
+
 });
 
-// async function loadposts(view){
-//     const view = view
+async function loadposts(event){
 
-//     if (view === index){
-//         try{
-//             const request = await fetch('/posts/all')
-//             response = request.json()
-//             console.log(response)
-//         }
-//         catch(error){
-//             console.log(error)
-//         }
-//     }
-// }
+    document.querySelector("#posts").innerHTML = "";
+
+    let page = "All Posts";
+
+    if (event.innerHTML === 'All Posts'){
+        page = "/posts"
+    }
+
+    try{
+        const request = await fetch(page);
+        const response = await request.json();
+        console.log(response)
+
+        response.forEach(content => {
+            const element = document.querySelector("#posts");
+
+            const post = generatePost(content);
+
+            element.append(post);
+        });
+    }
+    catch(error){
+        console.log(error)
+    }
+
+}
 
 async function createPost(){
 
@@ -42,8 +65,7 @@ async function createPost(){
         });
 
         const response = await request.json();
-
-        console.log(response.code)
+        console.log(response);
 
     }
     catch(error){

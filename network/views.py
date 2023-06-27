@@ -12,7 +12,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view
 from .serializers import PostSerializer
-
+from django.core.paginator import Paginator
 
 
 def index(request):
@@ -39,9 +39,20 @@ def posts(request):
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         else:
-            return JsonResponse({"error": "safsaf"}, status=201)
+            return Response({"error": "safsaf"}, status=status.HTTP_403_FORBIDDEN)
         
-    return JsonResponse({"error": "error"}, status=201)
+    if request.method == "GET":
+        
+        posts = Posts.objects.all()
+    
+        paginator = Paginator(posts, 10)
+        page_number = 1
+        page_obj = paginator.get_page(page_number)
+        print(page_obj)
+        serializer = PostSerializer(page_obj, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
 
 
 def login_view(request):
