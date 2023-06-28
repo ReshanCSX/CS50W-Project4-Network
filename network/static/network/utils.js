@@ -23,3 +23,22 @@ export function alert(type, message){
     alert.classList.add(`alert-${type}`);
     window.scrollTo(0,0);
 }
+
+export function updatePaginator(data){
+    // Paginator configerations
+
+    active_page = document.querySelector(".active")
+
+    let page_number = data.paginator.page_number;
+    let page_count = data.paginator.page_count;
+
+    document.querySelectorAll(".paginator-num").forEach(paginator_item => {
+        paginator_item.innerHTML = page_number
+
+        if (page_number > page_count){
+            paginator_item.parentNode.classList.add("disabled");
+        }
+
+        page_number++
+    });
+}

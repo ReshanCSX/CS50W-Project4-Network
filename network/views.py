@@ -44,13 +44,31 @@ def posts(request):
     if request.method == "GET":
         
         posts = Posts.objects.all()
-    
+
+        # Paginator initialization
         paginator = Paginator(posts, 10)
-        page_number = 1
+
+        # Getting the requested page by the user
+        page_number = request.GET.get('page')
+        page_number = page_number if page_number else 1
+
+        # Creating the paginator object
         page_obj = paginator.get_page(page_number)
-        print(page_obj)
+
+        # Serializing the paginator object
         serializer = PostSerializer(page_obj, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+
+        data = {
+            "paginator": {
+                "has_previous" : page_obj.has_previous(),
+                "has_next" : page_obj.has_next(),
+                "page_number" :page_number,
+                "page_count" : paginator.num_pages
+            },
+            "serializer" : serializer.data
+        }
+
+        return Response(data, status=status.HTTP_200_OK)
 
 
 

@@ -1,6 +1,7 @@
-import { alert, getCookie } from './utils.js';
+import { alert, getCookie, updatePaginator } from './utils.js';
 import { generatePost } from './generator.js';
 
+// Improve paginator
 
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelector("#index").addEventListener('click', () => loadView("index"));
@@ -10,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-function loadView(page){
+function loadView(view){
 
     let homeview = document.querySelector("#home-view");
     let profileview = document.querySelector("#profile-view");
@@ -18,41 +19,55 @@ function loadView(page){
     homeview.style.display = 'none';
     profileview.style.display = 'none';
 
-    if (page === "profile"){
+    if (view === "profile"){
         homeview.style.display = 'none';
         profileview.style.display = 'block';
 
-    } else if(page === "index"){
+    } else if(view === "index"){
         homeview.style.display = 'block';
         profileview.style.display = 'none';
 
-        loadPosts("index")
+        const page_number = 1
+
+        loadPosts("index", page_number)
     }
 
 }
 
 
-async function loadPosts(page){
+async function loadPosts(view, page_number){
 
     let url
 
-    if (page === 'index'){
-        url = '/posts'
+    if (view === 'index'){
+        url = `/posts?page=${page_number}`
     }
-
 
     try{
         const request = await fetch(url);
         const response = await request.json();
-        console.log(response)
 
-        response.forEach(content => {
+        if(response.paginator.has_next == false){
+            document.querySelector("#previous_page").classList.add("disabled");
+        }
+
+        if(response.paginator.has_next == false){
+            document.querySelector("#next_page").classList.add("disabled");
+        }
+
+        // Appending posts
+        response.serializer.forEach(content => {
             const element = document.querySelector("#posts");
 
             const post = generatePost(content);
 
             element.append(post);
         });
+
+
+        updatePaginator(response);
+
+
     }
     catch(error){
         console.log(error)
