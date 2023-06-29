@@ -19,15 +19,17 @@ function loadView(view){
     homeview.style.display = 'none';
     profileview.style.display = 'none';
 
+    const page_number = 1
+
     if (view === "profile"){
         homeview.style.display = 'none';
         profileview.style.display = 'block';
 
+        loadPosts("profile", page_number)
+
     } else if(view === "index"){
         homeview.style.display = 'block';
         profileview.style.display = 'none';
-
-        const page_number = 1
 
         loadPosts("index", page_number)
     }
@@ -37,10 +39,17 @@ function loadView(view){
 
 async function loadPosts(view, page_number){
 
+    document.querySelector("#posts").innerHTML = "";
+
     let url
 
     if (view === 'index'){
         url = `/posts?page=${page_number}`
+    }
+
+    if (view === 'profile'){
+        url = `1/posts?page=${page_number}`
+        console.log(url)
     }
 
     try{
@@ -77,6 +86,8 @@ async function loadPosts(view, page_number){
 
 async function createPost(){
 
+    let content = document.querySelector('#post_content');
+
     try{
         const request = await fetch('/posts', {
             
@@ -90,13 +101,15 @@ async function createPost(){
                 'Content-Type': 'application/json'
             },
             body : JSON.stringify({
-                content : document.querySelector('#post_content').value
+                content : content.value
             })
 
         });
 
         const response = await request.json();
-        console.log(response);
+
+        content.value = "";
+        loadPosts("index", 1);
 
     }
     catch(error){
