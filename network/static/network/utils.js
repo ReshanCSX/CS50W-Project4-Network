@@ -25,9 +25,8 @@ export function alert(type, message){
 }
 
 export function updatePaginator(data){
+    
     // Paginator configerations
-
-    active_page = document.querySelector(".active")
 
     let page_number = data.paginator.page_number;
     let page_count = data.paginator.page_count;
@@ -41,4 +40,14 @@ export function updatePaginator(data){
 
         page_number++
     });
+}
+
+export function getCurrentView() {
+
+    if (getComputedStyle(document.querySelector("#home-view")).display === "block") {
+        return "home";
+    } else if (getComputedStyle(document.querySelector("#profile-view")).display === "block") {
+        return "profile";
+    }    
+        
 }

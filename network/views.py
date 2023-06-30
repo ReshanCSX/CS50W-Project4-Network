@@ -11,13 +11,57 @@ from .models import User, Posts
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view
-from .serializers import PostSerializer
+from .serializers import PostSerializer, UserSerializer
 from django.core.paginator import Paginator
 
 
 def index(request):
 
     return render(request, "network/index.html")
+
+
+@api_view(['GET'])
+def userinfo(request, id):
+
+    try:
+        user = User.objects.get(pk=id)
+    except:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    
+    print(user.following.count())
+    print(user.follower.count())
+
+    serializer = UserSerializer(user)
+
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def userposts(request, id):
+
+    posts = Posts.objects.filter(author=id)
+
+    paginator = Paginator(posts, 10)
+
+    # Getting the requested page by the user
+    page_number = request.GET.get('page') or 1
+
+    page_obj = paginator.get_page(page_number)
+
+    # Serializing the paginator object
+    serializer = PostSerializer(page_obj, many=True)
+
+    data = {
+        "paginator": {
+            "has_previous" : page_obj.has_previous(),
+            "has_next" : page_obj.has_next(),
+            "page_number" :page_number,
+            "page_count" : paginator.num_pages
+        },
+        "serializer" : serializer.data
+    }
+
+    return Response(data, status=status.HTTP_200_OK)
 
 
 @api_view(['GET', 'POST'])
@@ -39,7 +83,7 @@ def posts(request):
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         else:
-            return Response({"error": "safsaf"}, status=status.HTTP_403_FORBIDDEN)
+            return Response({"error": "You have to be logged in"}, status=status.HTTP_403_FORBIDDEN)
         
     if request.method == "GET":
         
@@ -49,8 +93,7 @@ def posts(request):
         paginator = Paginator(posts, 10)
 
         # Getting the requested page by the user
-        page_number = request.GET.get('page')
-        page_number = page_number if page_number else 1
+        page_number = request.GET.get('page') or 1
 
         # Creating the paginator object
         page_obj = paginator.get_page(page_number)

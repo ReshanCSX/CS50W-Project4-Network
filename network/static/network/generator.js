@@ -6,7 +6,7 @@ export function generatePost(content){
         <div class="container-fluid p-3">
 
             <div class="row mb-3">
-                <div class="col-auto small"><a href="user/${content.author}">@${content.author_name}</a></div>
+                <div class="col-auto small"><a href="#" data-id="${content.author}" class="username">@${content.author_name}</a></div>
                 <div class="col-auto small text-muted">${content.timestamp}</div>
             </div>
             <div class="row">
