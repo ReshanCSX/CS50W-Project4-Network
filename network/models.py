@@ -16,3 +16,10 @@ class Posts(models.Model):
     
     class Meta:
         ordering = ['-timestamp']
+
+class Followers(models.Model):
+    follower = models.ForeignKey("User", on_delete=models.CASCADE, related_name="follower")
+    following = models.ForeignKey("User", on_delete=models.CASCADE, related_name="following")
+
+    def __str__(self):
+        return f"{self.follower} follows {self.following}"

@@ -41,3 +41,13 @@ export function updatePaginator(data){
         page_number++
     });
 }
+
+export function getCurrentView() {
+
+    if (getComputedStyle(document.querySelector("#home-view")).display === "block") {
+        return "home";
+    } else if (getComputedStyle(document.querySelector("#profile-view")).display === "block") {
+        return "profile";
+    }    
+        
+}

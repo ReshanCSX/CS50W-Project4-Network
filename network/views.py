@@ -11,7 +11,7 @@ from .models import User, Posts
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view
-from .serializers import PostSerializer
+from .serializers import PostSerializer, UserSerializer
 from django.core.paginator import Paginator
 
 
@@ -20,7 +20,23 @@ def index(request):
     return render(request, "network/index.html")
 
 
-@api_view(['GET','POST'])
+@api_view(['GET'])
+def userinfo(request, id):
+
+    try:
+        user = User.objects.get(pk=id)
+    except:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    
+    print(user.following.count())
+    print(user.follower.count())
+
+    serializer = UserSerializer(user)
+
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
 def userposts(request, id):
 
     posts = Posts.objects.filter(author=id)
