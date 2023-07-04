@@ -1,3 +1,4 @@
+
 import { alert, getCookie, getCurrentView, getURL } from './utils.js';
 import { generatePost } from './generator.js';
 
@@ -42,7 +43,6 @@ document.addEventListener('DOMContentLoaded', () => {
         loadPosts(url);
     })
 
-
     // Load profile page when clicked on nav bar link
     const profileElement = document.querySelector("#profile");
 
@@ -51,7 +51,8 @@ document.addEventListener('DOMContentLoaded', () => {
         loadView("profile", value);
     });
 
-    // Loading the view when the page first rendered
+
+    // Loading the view when the page first renders
     loadView("index");
 
 });
@@ -78,11 +79,11 @@ function loadView(view, id){
         loadProfile(id);
 
         // Building the URL
+
         const url = getURL(page_number, id);
 
         // Loading posts
         loadPosts(url);
-
 
     } else if(view === "index"){
 
@@ -92,12 +93,19 @@ function loadView(view, id){
 
         // Building the URL
         const url = getURL(page_number)
-
+        
         // Loading posts
         loadPosts(url)
     }
 
 }
+
+async function loadProfile(id){
+    const url = `/user/${id}`; 
+    
+    try{
+        const request = await fetch(url);
+        const response = await request.json();
 
 
 async function loadProfile(id){
@@ -158,13 +166,12 @@ async function loadPosts(url){
             });
         });
 
-
+      
         // Update paginator numbers
         updatePaginator(response.paginator);
 
         // Update globle page number
         CURRENT_PAGE_NUMBER = parseInt(response.paginator.page_number);
-
 
     }
     catch(error){

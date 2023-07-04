@@ -26,6 +26,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['username', 'id', 'followers', 'following']
 
+
     def get_followers(self, object):
         return object.follower.count()
     
