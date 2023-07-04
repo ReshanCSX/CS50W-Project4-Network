@@ -1,12 +1,47 @@
-import { alert, getCookie, updatePaginator, getCurrentView } from './utils.js';
-import { generatePost } from './generator.js'; 
+import { alert, getCookie, getCurrentView, getURL } from './utils.js';
+import { generatePost } from './generator.js';
 
 
-// Improve paginator
+let CURRENT_PAGE_NUMBER = 1;
+
 
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelector("#index").addEventListener('click', () => loadView("index"));
-    document.querySelector('#create_post')?.addEventListener('click', () => createPost());
+    document.querySelector("#create_post")?.addEventListener('click', () => createPost());
+
+
+    // Paginator page number eventlistner
+    document.querySelectorAll(".paginator-num").forEach(number => {
+
+        number.addEventListener("click", event => {
+
+            let url;
+
+            if (getCurrentView() === 'profile'){
+                const user_id = document.querySelector("#profile_name").dataset.id;
+                url = getURL(event.target.innerHTML, user_id);
+            }
+            else{
+                url = getURL(event.target.innerHTML);
+            }
+            
+            loadPosts(url);
+
+        })
+    })
+
+    // Paginator previous button eventlistner
+    document.querySelector("#paginator-previous").addEventListener("click", () => {
+        const url = getURL(CURRENT_PAGE_NUMBER - 1)
+        loadPosts(url);
+    })
+
+    // Paginator next button eventlistner
+    document.querySelector("#paginator-next").addEventListener("click", () => {
+        const url = getURL(CURRENT_PAGE_NUMBER + 1)
+        loadPosts(url);
+    })
+
 
     // Load profile page when clicked on nav bar link
     const profileElement = document.querySelector("#profile");
@@ -16,8 +51,11 @@ document.addEventListener('DOMContentLoaded', () => {
         loadView("profile", value);
     });
 
+    // Loading the view when the page first rendered
     loadView("index");
+
 });
+
 
 
 function loadView(view, id){
@@ -40,10 +78,11 @@ function loadView(view, id){
         loadProfile(id);
 
         // Building the URL
-        const url = `${id}/posts?page=${page_number}`
+        const url = getURL(page_number, id);
 
         // Loading posts
-        loadPosts(url)
+        loadPosts(url);
+
 
     } else if(view === "index"){
 
@@ -52,7 +91,7 @@ function loadView(view, id){
         profileview.style.display = 'none';
 
         // Building the URL
-        const url = `/posts?page=${page_number}`
+        const url = getURL(page_number)
 
         // Loading posts
         loadPosts(url)
@@ -60,8 +99,10 @@ function loadView(view, id){
 
 }
 
+
 async function loadProfile(id){
-    const url = `/user/${id}`; 
+
+    const url = `/user/${id}`;
     
     try{
         const request = await fetch(url);
@@ -72,6 +113,7 @@ async function loadProfile(id){
         let following_count = document.querySelector("#following_count");
 
         profile_name.innerHTML = response.username;
+        profile_name.dataset.id = response.id;
         followers_count.innerHTML = response.followers;
         following_count.innerHTML = response.following;
     }   
@@ -117,7 +159,11 @@ async function loadPosts(url){
         });
 
 
-        updatePaginator(response);
+        // Update paginator numbers
+        updatePaginator(response.paginator);
+
+        // Update globle page number
+        CURRENT_PAGE_NUMBER = parseInt(response.paginator.page_number);
 
 
     }
@@ -152,7 +198,7 @@ async function createPost(){
         const response = await request.json();
 
         content.value = "";
-        loadPosts("index", 1);
+        loadView("index");
 
     }
     catch(error){
@@ -161,3 +207,80 @@ async function createPost(){
 
 
 }
+
+
+function updatePaginator(data){
+
+    const pages = data.page_count;
+    let current_page = data.page_number;
+
+    // Enable or disable nextpage button 
+    if (!data.has_next){
+        document.querySelector("#next_page").classList.add("disabled");
+    }
+    else{
+        document.querySelector("#next_page").classList.remove("disabled");
+    }
+
+    // Enable or disable previous page button
+    if(!data.has_previous){
+        document.querySelector("#previous_page").classList.add("disabled");
+    }
+    else{
+        document.querySelector("#previous_page").classList.remove("disabled");
+    }
+
+    // Setting each page numbers
+    document.querySelectorAll(".paginator-num").forEach(paginator_item => {
+
+        paginator_item.parentNode.classList.remove("disabled");
+
+        paginator_item.innerHTML = current_page;
+
+        if (current_page > pages){
+            paginator_item.parentNode.classList.add("disabled");
+        }
+
+        current_page++;
+    });
+}
+
+
+
+
+// check if the event listner added
+// let eventListenersAdded = false;
+
+// function updatePaginator(data){
+    
+//     // Paginator configerations
+
+//     let page_number = data.paginator.page_number;
+//     let page_count = data.paginator.page_count;
+
+//     document.querySelectorAll(".paginator-num").forEach(paginator_item => {
+
+//         paginator_item.innerHTML = page_number
+
+//         if (page_number > page_count){
+//             paginator_item.parentNode.classList.add("disabled");
+//         }
+
+
+
+//             paginator_item.addEventListener('click', event => {
+
+//                 const url = getURL(event.target.innerHTML);
+//                 console.log(event.target.innerHTML);
+//                 const currentView = getCurrentView();
+
+//                 loadPosts(url, (currentView)? currentView : null);
+                
+//             });
+
+
+//         page_number++
+//     });
+
+//     eventListenersAdded = true;
+// }
