@@ -24,23 +24,6 @@ export function alert(type, message){
     window.scrollTo(0,0);
 }
 
-export function updatePaginator(data){
-    
-    // Paginator configerations
-
-    let page_number = data.paginator.page_number;
-    let page_count = data.paginator.page_count;
-
-    document.querySelectorAll(".paginator-num").forEach(paginator_item => {
-        paginator_item.innerHTML = page_number
-
-        if (page_number > page_count){
-            paginator_item.parentNode.classList.add("disabled");
-        }
-
-        page_number++
-    });
-}
 
 export function getCurrentView() {
 
@@ -50,4 +33,18 @@ export function getCurrentView() {
         return "profile";
     }    
         
+}
+
+
+export function getURL(page_number, id) {
+    
+    let url;
+
+    if (id) {
+        url = `${id}/posts?page=${page_number}`
+    } else {
+        url = `/posts?page=${page_number}`
+    }
+
+    return url;
 }
