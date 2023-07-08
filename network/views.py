@@ -13,6 +13,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from .serializers import PostSerializer, UserSerializer
 from django.core.paginator import Paginator
+from django.contrib.auth.decorators import login_required
 
 
 def index(request):
@@ -27,13 +28,50 @@ def userinfo(request, id):
         user = User.objects.get(pk=id)
     except:
         return Response(status=status.HTTP_404_NOT_FOUND)
-    
-    print(user.following.count())
-    print(user.follower.count())
 
     serializer = UserSerializer(user)
 
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+def serializedata(request, posts):
+
+    # creating paginator
+    paginator = Paginator(posts, 10)
+
+    # getting requested page
+    page_number = request.GET.get('page') or 1
+
+    # creating page object
+    page_obj = paginator.get_page(page_number)
+
+    # serializing the page object
+    serializer = PostSerializer(page_obj, many=True)
+
+    # Adding other information
+    data = {
+        "paginator": {
+            "has_previous" : page_obj.has_previous(),
+            "has_next" : page_obj.has_next(),
+            "page_number" : page_number,
+            "page_count" : paginator.num_pages
+        },
+        "serializer" : serializer.data
+    }
+
+    return data
+
+
+@api_view(['GET'])
+@login_required
+def followingsposts(request):
+
+    user_following = User.objects.get(pk=request.user.id).follower.all().values("following")
+    posts = Posts.objects.filter(author__in=user_following)
+
+    data = serializedata(request, posts)
+
+    return Response(data, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
@@ -41,25 +79,7 @@ def userposts(request, id):
 
     posts = Posts.objects.filter(author=id)
 
-    paginator = Paginator(posts, 10)
-
-    # Getting the requested page by the user
-    page_number = request.GET.get('page') or 1
-
-    page_obj = paginator.get_page(page_number)
-
-    # Serializing the paginator object
-    serializer = PostSerializer(page_obj, many=True)
-
-    data = {
-        "paginator": {
-            "has_previous" : page_obj.has_previous(),
-            "has_next" : page_obj.has_next(),
-            "page_number" :page_number,
-            "page_count" : paginator.num_pages
-        },
-        "serializer" : serializer.data
-    }
+    data = serializedata(request, posts)
 
     return Response(data, status=status.HTTP_200_OK)
 
