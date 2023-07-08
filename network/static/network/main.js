@@ -1,9 +1,9 @@
+
 import { alert, getCookie, getCurrentView, getURL, getId } from './utils.js';
 import { generatePost } from './generator.js';
 
 
 let CURRENT_PAGE_NUMBER = 1;
-let CURRENT_VIEW = "index";
 
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         number.addEventListener("click", event => {
 
+
             let url = getURL(event.target.innerHTML, getId());
          
             loadPosts(url);
@@ -26,13 +27,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Paginator previous button eventlistner
     document.querySelector("#paginator-previous").addEventListener("click", () => {
+
         const url = getURL(CURRENT_PAGE_NUMBER - 1, getId())
+
         loadPosts(url);
     })
 
     // Paginator next button eventlistner
     document.querySelector("#paginator-next").addEventListener("click", () => {
+
         const url = getURL(CURRENT_PAGE_NUMBER + 1, getId())
+        
         loadPosts(url);
     })
 
@@ -175,10 +180,9 @@ async function loadPosts(url){
         // Update paginator numbers
         updatePaginator(response.paginator);
 
+
         // Update globle variables
         CURRENT_PAGE_NUMBER = parseInt(response.paginator.page_number);
-        CURRENT_VIEW = getCurrentView();
-
 
     }
     catch(error){
@@ -257,4 +261,7 @@ function updatePaginator(data){
 
         current_page++;
     });
+
 }
+
+
