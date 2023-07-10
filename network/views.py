@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.http import JsonResponse
 import json
 
-from .models import User, Posts
+from .models import User, Posts, Followers
 
 from rest_framework.response import Response
 from rest_framework import status
@@ -28,10 +28,23 @@ def userinfo(request, id):
         user = User.objects.get(pk=id)
     except:
         return Response(status=status.HTTP_404_NOT_FOUND)
+    
+
+    is_follower = user.following.filter(follower=request.user).exists() if request.user.is_authenticated else None
 
     serializer = UserSerializer(user)
 
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    data = {
+        "username": serializer.data["username"],
+        "id": serializer.data["id"],
+        "followers": serializer.data["followers"],
+        "following": serializer.data["following"],
+        "is_follower" : is_follower,
+        "requested_by" : request.user.id if request.user.is_authenticated else None
+    }
+    
+
+    return Response(data, status=status.HTTP_200_OK)
 
 
 def serializedata(request, posts):
@@ -72,6 +85,49 @@ def followingsposts(request):
     data = serializedata(request, posts)
 
     return Response(data, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@login_required
+def follow(request, id):
+
+    user = request.user
+    follow_user = User.objects.get(pk=id)
+
+    # Check if the user is trying to follow themselves.
+    if user == follow_user:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+    
+    # Load data
+    data = request.data
+    action = data.get('action')
+
+    # Check if the valid action.
+    if action not in ['follow', 'unfollow']:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+    
+ 
+    if action == "follow":
+
+        # Check if the user is already following other user.
+        if Followers.objects.filter(follower=user, following=follow_user).exists():
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        
+        # Create a new followers object
+        Followers.objects.create(follower=user, following=follow_user)
+
+
+    elif action == "unfollow":
+
+        # Check if the user is not following other user.
+        if not Followers.objects.filter(follower=user, following=follow_user).exists():
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        
+        # Deleting the followers object
+        Followers.objects.filter(follower=user, following=follow_user).delete()
+
+    
+    return Response({'id' : follow_user.id}, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
@@ -132,8 +188,6 @@ def posts(request):
         }
 
         return Response(data, status=status.HTTP_200_OK)
-
-
 
 
 def login_view(request):

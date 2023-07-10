@@ -1,6 +1,6 @@
 
 import { alert, getCookie, getCurrentView, getURL, getId } from './utils.js';
-import { generatePost } from './generator.js';
+import { generatePost, generateProfile, generateFollow } from './generator.js';
 
 
 let CURRENT_PAGE_NUMBER = 1;
@@ -123,21 +123,70 @@ async function loadProfile(id){
     const url = `/user/${id}`;
     
     try{
+        // Fetch user info
         const request = await fetch(url);
         const response = await request.json();
 
-        let profile_name = document.querySelector("#profile_name");
-        let followers_count = document.querySelector("#followers_count");
-        let following_count = document.querySelector("#following_count");
+        // Generate profile
+        let profile_view = document.querySelector("#profile-view");
+        const profile = generateProfile(response);
+        
+        // Add profile information to view
+        profile_view.innerHTML = "";
+        profile_view.append(profile);
 
-        profile_name.innerHTML = response.username;
-        profile_name.dataset.id = response.id;
-        followers_count.innerHTML = response.followers;
-        following_count.innerHTML = response.following;
+        // Generating follow button
+
+        if (response.id !== response.requested_by && response.requested_by !== null){
+            let profile_section = document.querySelector("#follow_section");
+            const followButton = generateFollow(response);
+            
+            profile_section.append(followButton);
+
+
+            followButton.addEventListener('click', () =>{
+                
+                follow(response.id, response.is_follower ? "unfollow" : "follow")
+            });
+            
+        }
+
     }   
     catch(error){
         console.log(error);
     }
+}
+
+async function follow(id, action){
+
+    try{
+
+        const request = await fetch(`user/${id}/follow`, {
+            method: "POST",
+            credentials: "same-origin",
+            headers: {
+
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken' : getCookie("csrftoken"),
+                'Content-Type': 'application/json'
+            },
+            body : JSON.stringify({action})
+            
+        }); 
+
+        const response = await request;
+
+        if(response.ok){
+            const content = await response.json();
+            loadProfile(content.id);
+        }
+
+    }
+    catch(error){
+        console.log(error);
+    }
+
 }
 
 
