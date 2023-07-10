@@ -1,5 +1,6 @@
-import { alert, getCookie, getCurrentView, getURL } from './utils.js';
-import { generatePost } from './generator.js';
+
+import { alert, getCookie, getCurrentView, getURL, getId } from './utils.js';
+import { generatePost, generateProfile, generateFollow } from './generator.js';
 
 
 let CURRENT_PAGE_NUMBER = 1;
@@ -8,6 +9,7 @@ let CURRENT_PAGE_NUMBER = 1;
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelector("#index").addEventListener('click', () => loadView("index"));
     document.querySelector("#create_post")?.addEventListener('click', () => createPost());
+    document.querySelector("#following")?.addEventListener('click', () => loadView("following"));
 
 
     // Paginator page number eventlistner
@@ -15,16 +17,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         number.addEventListener("click", event => {
 
-            let url;
 
-            if (getCurrentView() === 'profile'){
-                const user_id = document.querySelector("#profile_name").dataset.id;
-                url = getURL(event.target.innerHTML, user_id);
-            }
-            else{
-                url = getURL(event.target.innerHTML);
-            }
-            
+            let url = getURL(event.target.innerHTML, getId());
+         
             loadPosts(url);
 
         })
@@ -32,13 +27,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Paginator previous button eventlistner
     document.querySelector("#paginator-previous").addEventListener("click", () => {
-        const url = getURL(CURRENT_PAGE_NUMBER - 1)
+
+        const url = getURL(CURRENT_PAGE_NUMBER - 1, getId())
+
         loadPosts(url);
     })
 
     // Paginator next button eventlistner
     document.querySelector("#paginator-next").addEventListener("click", () => {
-        const url = getURL(CURRENT_PAGE_NUMBER + 1)
+
+        const url = getURL(CURRENT_PAGE_NUMBER + 1, getId())
+        
         loadPosts(url);
     })
 
@@ -63,9 +62,11 @@ function loadView(view, id){
 
     let homeview = document.querySelector("#home-view");
     let profileview = document.querySelector("#profile-view");
+    let followingview = document.querySelector("#following-view");
 
     homeview.style.display = 'none';
     profileview.style.display = 'none';
+    followingview.style.display = 'none';
 
     const page_number = 1
 
@@ -73,6 +74,7 @@ function loadView(view, id){
 
         // Setting the view
         homeview.style.display = 'none';
+        followingview.style.display = 'none';
         profileview.style.display = 'block';
 
         loadProfile(id);
@@ -88,7 +90,23 @@ function loadView(view, id){
 
         // Setting the view
         homeview.style.display = 'block';
+        followingview.style.display = 'none';
         profileview.style.display = 'none';
+        
+
+        // Building the URL
+        const url = getURL(page_number)
+
+        // Loading posts
+        loadPosts(url)
+
+
+    } else if(view === "following"){
+
+        homeview.style.display = 'none';
+        profileview.style.display = 'none';
+        followingview.style.display = 'block';
+
 
         // Building the URL
         const url = getURL(page_number)
@@ -105,21 +123,70 @@ async function loadProfile(id){
     const url = `/user/${id}`;
     
     try{
+        // Fetch user info
         const request = await fetch(url);
         const response = await request.json();
 
-        let profile_name = document.querySelector("#profile_name");
-        let followers_count = document.querySelector("#followers_count");
-        let following_count = document.querySelector("#following_count");
+        // Generate profile
+        let profile_view = document.querySelector("#profile-view");
+        const profile = generateProfile(response);
+        
+        // Add profile information to view
+        profile_view.innerHTML = "";
+        profile_view.append(profile);
 
-        profile_name.innerHTML = response.username;
-        profile_name.dataset.id = response.id;
-        followers_count.innerHTML = response.followers;
-        following_count.innerHTML = response.following;
+        // Generating follow button
+
+        if (response.id !== response.requested_by && response.requested_by !== null){
+            let profile_section = document.querySelector("#follow_section");
+            const followButton = generateFollow(response);
+            
+            profile_section.append(followButton);
+
+
+            followButton.addEventListener('click', () =>{
+                
+                follow(response.id, response.is_follower ? "unfollow" : "follow")
+            });
+            
+        }
+
     }   
     catch(error){
         console.log(error);
     }
+}
+
+async function follow(id, action){
+
+    try{
+
+        const request = await fetch(`user/${id}/follow`, {
+            method: "POST",
+            credentials: "same-origin",
+            headers: {
+
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken' : getCookie("csrftoken"),
+                'Content-Type': 'application/json'
+            },
+            body : JSON.stringify({action})
+            
+        }); 
+
+        const response = await request;
+
+        if(response.ok){
+            const content = await response.json();
+            loadProfile(content.id);
+        }
+
+    }
+    catch(error){
+        console.log(error);
+    }
+
 }
 
 
@@ -162,9 +229,9 @@ async function loadPosts(url){
         // Update paginator numbers
         updatePaginator(response.paginator);
 
-        // Update globle page number
-        CURRENT_PAGE_NUMBER = parseInt(response.paginator.page_number);
 
+        // Update globle variables
+        CURRENT_PAGE_NUMBER = parseInt(response.paginator.page_number);
 
     }
     catch(error){
@@ -243,44 +310,7 @@ function updatePaginator(data){
 
         current_page++;
     });
+
 }
 
 
-
-
-// check if the event listner added
-// let eventListenersAdded = false;
-
-// function updatePaginator(data){
-    
-//     // Paginator configerations
-
-//     let page_number = data.paginator.page_number;
-//     let page_count = data.paginator.page_count;
-
-//     document.querySelectorAll(".paginator-num").forEach(paginator_item => {
-
-//         paginator_item.innerHTML = page_number
-
-//         if (page_number > page_count){
-//             paginator_item.parentNode.classList.add("disabled");
-//         }
-
-
-
-//             paginator_item.addEventListener('click', event => {
-
-//                 const url = getURL(event.target.innerHTML);
-//                 console.log(event.target.innerHTML);
-//                 const currentView = getCurrentView();
-
-//                 loadPosts(url, (currentView)? currentView : null);
-                
-//             });
-
-
-//         page_number++
-//     });
-
-//     eventListenersAdded = true;
-// }

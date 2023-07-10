@@ -28,9 +28,9 @@ class UserSerializer(serializers.ModelSerializer):
 
 
     def get_followers(self, object):
-        return object.follower.count()
+        return object.following.count()
     
     def get_following(self, object):
-        return object.following.count()
+        return object.follower.count()
 
         
