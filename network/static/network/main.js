@@ -1,6 +1,7 @@
 
-import { alert, getCookie, getCurrentView, getURL, getId } from './utils.js';
-import { generatePost, generateProfile, generateFollow } from './generator.js';
+
+import { alert, getCookie, getCurrentView, getURL, getId, getPostBody } from './utils.js';
+import { generatePost, generateProfile, generateFollow, generateEditButton } from './generator.js';
 
 
 let CURRENT_PAGE_NUMBER = 1;
@@ -175,6 +176,7 @@ async function follow(id, action){
             
         }); 
 
+        // fix bug
         const response = await request;
 
         if(response.ok){
@@ -207,13 +209,11 @@ async function loadPosts(url){
             document.querySelector("#next_page").classList.add("disabled");
         }
 
+        const requested_by = response.requested_by;
+
         // Appending posts
         response.serializer.forEach(content => {
-            const element = document.querySelector("#posts");
-
-            const post = generatePost(content);
-
-            element.append(post);
+            addPostsToDOM(content, requested_by);
         });
 
 
@@ -240,6 +240,144 @@ async function loadPosts(url){
 
 }
 
+function addPostsToDOM(content, requested_by){
+
+    const post_section = document.querySelector('#posts');
+
+    const post = generatePost(content);
+
+    // Check if the user is authenticated
+    if (requested_by){
+
+        // Creating the div section
+        const footerSection = document.createElement('div');
+        const footerCol = document.createElement('div');
+
+        footerSection.classList.add('row', 'mb-2');
+        footerCol.classList.add('col');
+
+        footerSection.append(footerCol);
+
+        // Checking if the requested user is the user who created the post
+        if (requested_by === content.author){
+
+            // Generating edit button and appending to the footer
+            const editButton = generateEditButton();
+            footerCol.append(editButton);
+
+            // Adding an event listener to the edit button
+            editButton.addEventListener('click', event => editPost(event.target, footerCol, editButton))
+            
+            // Appending the footer section to post container
+            post.querySelector(".post_container").append(footerSection);
+        }
+
+    }
+
+    // Appending the post to post section
+    post_section.append(post);
+}
+
+
+function editPost(event, footerCol, editButton){
+
+    // Getting the post content.
+    const post_body = getPostBody(event);
+    const post_body_copy = post_body.innerHTML;
+    const post_id = post_body.id;
+    
+    // Creating the textarea to edit.
+    const text_area = document.createElement('textarea');
+    text_area.classList.add('form-control', 'textarea');
+    text_area.rows = '4';
+
+    // Passing the post body content to textarea.
+    text_area.innerHTML = post_body.innerHTML;
+
+    // Clear the div and append text area
+    post_body.innerHTML = "";
+    post_body.append(text_area)
+
+    // Creating a submit and reset buttons
+    const submit_button = document.createElement('button');
+    const reset_button = document.createElement('button');
+
+    submit_button.innerHTML = "Edit Post";
+    reset_button.innerHTML = "Close";
+
+    submit_button.classList.add('btn', 'btn-primary', 'btn-sm');
+    reset_button.classList.add('btn', 'btn-outline-secondary', 'btn-sm')
+
+    reset_button.addEventListener('click', () => {
+
+        post_body.innerHTML = "";
+        post_body.innerHTML = post_body_copy;
+
+        resetEditPost(submit_button, reset_button, footerCol, editButton)
+    })
+
+    // Adding a eventlistner to submit button
+    submit_button.addEventListener('click', async event => {
+
+        const post_body = getPostBody(event.target);
+        const textarea_value = post_body.querySelector('textarea').value;
+        const edit_post = await submitEditedPost(post_id, textarea_value);
+
+        if(edit_post){
+            // Clearing and adding the new content to post body
+            post_body.innerHTML = "";
+            post_body.innerHTML = edit_post.content;
+
+            // Resetting the view
+            resetEditPost(submit_button, reset_button, footerCol, editButton)
+        }
+    })
+
+    // Appending submit button
+    footerCol.classList.add('d-grid', 'gap-2', 'd-md-flex', 'justify-content-md-end');
+    footerCol.append(reset_button, submit_button);
+
+    // Removing the edit button when user click on it
+    editButton.remove();
+
+}
+
+function resetEditPost(submit_button, reset_button, footerCol, editButton){
+    submit_button.remove();
+    reset_button.remove();
+    footerCol.append(editButton);
+    footerCol.classList.remove('d-grid', 'gap-2', 'd-md-flex', 'justify-content-md-end');
+}
+
+async function submitEditedPost(postId, content){
+
+    try{
+        const request = await fetch(`/post/${postId}`, {
+            method : 'PUT',
+            credentials : 'same-origin',
+            headers : {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken' : getCookie("csrftoken"),
+                'Content-Type': 'application/json'
+            },
+            body : JSON.stringify({
+                content: content
+            })
+        })
+        
+        if(request.ok){
+            const response = await request.json();
+            return response;
+        }
+        
+    }
+    catch(error){
+        console.log(error)
+    }
+}
+
+
 async function createPost(){
 
     let content = document.querySelector('#post_content');
@@ -262,6 +400,7 @@ async function createPost(){
 
         });
 
+        // FURTHER DEVELOPMENT
         const response = await request.json();
 
         content.value = "";

@@ -3,16 +3,15 @@ export function generatePost(content){
 
     container.innerHTML = `
     <div class="col-12 col-md-10 col-lg-8 border rounded">
-        <div class="container-fluid p-3">
+        <div class="container-fluid p-3 post_container">
 
             <div class="row mb-3">
                 <div class="col-auto small"><a href="#" data-id="${content.author}" class="username">@${content.author_name}</a></div>
                 <div class="col-auto small text-muted">${content.timestamp}</div>
             </div>
-            <div class="row">
-                <div class="col">${content.content}</div>
-            </div>
-        
+            <div class="row mb-2">
+                <div class="col post_body" id="${content.id}">${content.content}</div>
+            </div> 
         </div>
     </div>
     `
@@ -84,4 +83,15 @@ export function generateFollow(content){
     followSection.classList.add("col");
 
     return followSection
+}
+
+
+export function generateEditButton(){
+    const edit_button = document.createElement('button');
+
+    edit_button.innerHTML = "Edit";
+
+    edit_button.classList.add('btn', 'badge', 'bg-dark');
+
+    return edit_button
 }
