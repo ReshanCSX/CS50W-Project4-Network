@@ -69,3 +69,9 @@ export function getId(){
     }
   
 }
+
+export function getPostBody(element) {
+    const post_div = element.closest('.post_container');
+    const post_body = post_div.querySelector('.post_body');
+    return post_body;
+}

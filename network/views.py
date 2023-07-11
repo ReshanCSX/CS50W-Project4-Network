@@ -21,6 +21,37 @@ def index(request):
     return render(request, "network/index.html")
 
 
+@api_view(['PUT'])
+@login_required
+def editpost(request, id):
+    
+    try:
+        post = Posts.objects.get(pk=id)
+    except:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if post.author != request.user:
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+    
+    data = json.loads(request.body)
+
+    content = data.get('content', '')
+
+    if not content or len(content) > 1000:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        post.content = content
+        post.save()
+
+        serialize = PostSerializer(post)
+
+        return Response(serialize.data, status=status.HTTP_200_OK)
+    except:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+    
+
+
 @api_view(['GET'])
 def userinfo(request, id):
 
@@ -63,6 +94,7 @@ def serializedata(request, posts):
 
     # Adding other information
     data = {
+        "requested_by" : request.user.id if request.user.is_authenticated else None,
         "paginator": {
             "has_previous" : page_obj.has_previous(),
             "has_next" : page_obj.has_next(),
@@ -165,27 +197,7 @@ def posts(request):
         
         posts = Posts.objects.all()
 
-        # Paginator initialization
-        paginator = Paginator(posts, 10)
-
-        # Getting the requested page by the user
-        page_number = request.GET.get('page') or 1
-
-        # Creating the paginator object
-        page_obj = paginator.get_page(page_number)
-
-        # Serializing the paginator object
-        serializer = PostSerializer(page_obj, many=True)
-
-        data = {
-            "paginator": {
-                "has_previous" : page_obj.has_previous(),
-                "has_next" : page_obj.has_next(),
-                "page_number" :page_number,
-                "page_count" : paginator.num_pages
-            },
-            "serializer" : serializer.data
-        }
+        data = serializedata(request, posts)
 
         return Response(data, status=status.HTTP_200_OK)
 
