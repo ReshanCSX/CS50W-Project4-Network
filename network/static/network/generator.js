@@ -95,8 +95,3 @@ export function generateEditButton(){
 
     return edit_button
 }
-
-
-export function generateEdit(content){
-
-}

@@ -1,4 +1,5 @@
 
+
 import { alert, getCookie, getCurrentView, getURL, getId, getPostBody } from './utils.js';
 import { generatePost, generateProfile, generateFollow, generateEditButton } from './generator.js';
 
@@ -174,6 +175,7 @@ async function follow(id, action){
             body : JSON.stringify({action})
             
         }); 
+
         // fix bug
         const response = await request;
 
