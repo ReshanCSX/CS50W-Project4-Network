@@ -1,5 +1,6 @@
 
 
+
 import { alert, getCookie, getCurrentView, getURL, getId, getPostBody, likeCountMessage} from './utils.js';
 import { generatePost, generateProfile, generateFollow, generateEditButton, generateLikeButton } from './generator.js';
 
@@ -288,10 +289,10 @@ function addPostsToDOM(content, requested_by){
 
     }
 
-
     // Appending the post to post section
     post_section.append(post);
 }
+
 
 
 async function likePost(event, likeButton, likeCount){
@@ -373,6 +374,7 @@ function editPost(event, footerCol, editButton, likeButton, likeCount){
         post_body.innerHTML = "";
         post_body.innerHTML = post_body_copy;
 
+
         resetEditPost(submit_button, reset_button, footerCol, editButton, likeButton, likeCount)
     })
 
@@ -389,6 +391,7 @@ function editPost(event, footerCol, editButton, likeButton, likeCount){
             post_body.innerHTML = edit_post.content;
 
             // Resetting the view
+
             resetEditPost(submit_button, reset_button, footerCol, editButton, likeButton, likeCount)
         }
     })
@@ -398,6 +401,7 @@ function editPost(event, footerCol, editButton, likeButton, likeCount){
     footerCol.append(reset_button, submit_button);
 
     // Removing the edit button when user click on it
+
     likeCount.remove();
     likeButton.remove();
     editButton.remove();
@@ -414,7 +418,7 @@ function resetEditPost(submit_button, reset_button, footerCol, editButton, likeB
     footerCol.classList.remove('d-grid', 'gap-2', 'd-md-flex', 'justify-content-md-end');
 }
 
-
+ 
 async function submitEditedPost(postId, content){
 
     try{
