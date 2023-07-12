@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelector("#paginator-previous").addEventListener("click", () => {
 
         const url = getURL(CURRENT_PAGE_NUMBER - 1, getId())
-
+        
         loadPosts(url);
     })
 
@@ -304,7 +304,7 @@ async function likePost(event, likeButton, likeCount){
     
     // Changing like button
     if(like.is_liked){
-        likeButton.innerHTML = '<i class="bi bi-heart-fill"></i> Unlike'
+        likeButton.innerHTML = '<i class="bi bi-heart-fill"></i> Dislike'
         likeCount.innerHTML = likeCountMessage(like.like_count)
     } else{
         likeButton.innerHTML = '<i class="bi bi-heart"></i> Like';
