@@ -1,5 +1,6 @@
 // JavaScript function to acquire the CSRF token: https://docs.djangoproject.com/en/4.2/howto/csrf/
 export function getCookie(name) {
+  
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
         const cookies = document.cookie.split(';');
@@ -17,6 +18,7 @@ export function getCookie(name) {
 
 
 export function alert(type, message){
+  
     const alert = document.querySelector("#alert");
     alert.innerHTML += message;
     alert.style.display = 'block';
@@ -57,6 +59,7 @@ export function getURL(page_number, id) {
 }
 
 export function getId(){
+  
     const current_view = getCurrentView();
     if (current_view === "profile"){
 
@@ -71,9 +74,11 @@ export function getId(){
 }
 
 export function getPostBody(element) {
+  
     const post_div = element.closest('.post_container');
     const post_body = post_div.querySelector('.post_body');
     return post_body;
+
 }
 
 export function likeCountMessage(count) {
@@ -89,4 +94,5 @@ export function likeCountMessage(count) {
     }
 
     return message
+
 }

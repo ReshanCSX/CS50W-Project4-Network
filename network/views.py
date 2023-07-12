@@ -74,6 +74,37 @@ def editpost(request, id):
     
 
 
+@api_view(['PUT'])
+@login_required
+def editpost(request, id):
+    
+    try:
+        post = Posts.objects.get(pk=id)
+    except:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if post.author != request.user:
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+    
+    data = json.loads(request.body)
+
+    content = data.get('content', '')
+
+    if not content or len(content) > 1000:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        post.content = content
+        post.save()
+
+        serialize = PostSerializer(post)
+
+        return Response(serialize.data, status=status.HTTP_200_OK)
+    except:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+    
+
+
 @api_view(['GET'])
 def userinfo(request, id):
 
