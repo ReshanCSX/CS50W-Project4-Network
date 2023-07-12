@@ -75,3 +75,18 @@ export function getPostBody(element) {
     const post_body = post_div.querySelector('.post_body');
     return post_body;
 }
+
+export function likeCountMessage(count) {
+
+    let message
+
+    if(count > 1){
+        message = `${count} Likes.`;
+    } else if(count == 1){
+        message = `${count} Like.`;
+    } else {
+        message = "Be the first one to like this.";
+    }
+
+    return message
+}

@@ -1,7 +1,7 @@
 
 
-import { alert, getCookie, getCurrentView, getURL, getId, getPostBody } from './utils.js';
-import { generatePost, generateProfile, generateFollow, generateEditButton } from './generator.js';
+import { alert, getCookie, getCurrentView, getURL, getId, getPostBody, likeCountMessage} from './utils.js';
+import { generatePost, generateProfile, generateFollow, generateEditButton, generateLikeButton } from './generator.js';
 
 
 let CURRENT_PAGE_NUMBER = 1;
@@ -252,11 +252,24 @@ function addPostsToDOM(content, requested_by){
         // Creating the div section
         const footerSection = document.createElement('div');
         const footerCol = document.createElement('div');
+        const likeCount = document.createElement("span");
 
         footerSection.classList.add('row', 'mb-2');
         footerCol.classList.add('col');
-
+        likeCount.classList.add('small', 'text-muted');
+        
         footerSection.append(footerCol);
+        
+        // Generating the like button and adding like count
+        let likeButton = generateLikeButton(content.is_liked);
+        likeCount.innerHTML = likeCountMessage(content.like_count);
+
+        footerCol.append(likeButton);
+        footerCol.append(likeCount);
+
+        // Eventlistner for like button
+        likeButton.addEventListener('click', event => likePost(event.target, likeButton, likeCount))
+
 
         // Checking if the requested user is the user who created the post
         if (requested_by === content.author){
@@ -266,20 +279,67 @@ function addPostsToDOM(content, requested_by){
             footerCol.append(editButton);
 
             // Adding an event listener to the edit button
-            editButton.addEventListener('click', event => editPost(event.target, footerCol, editButton))
+            editButton.addEventListener('click', event => editPost(event.target, footerCol, editButton, likeButton, likeCount))
             
-            // Appending the footer section to post container
-            post.querySelector(".post_container").append(footerSection);
         }
 
+        // Appending the footer section to post container
+        post.querySelector(".post_container").append(footerSection);
+
     }
+
 
     // Appending the post to post section
     post_section.append(post);
 }
 
 
-function editPost(event, footerCol, editButton){
+async function likePost(event, likeButton, likeCount){
+    
+    // Getting the event ID
+    const post_body = getPostBody(event);
+    const post_id = post_body.id;
+
+    const like = await submitLikePost(post_id);
+    
+    // Changing like button
+    if(like.is_liked){
+        likeButton.innerHTML = '<i class="bi bi-heart-fill"></i> Unlike'
+        likeCount.innerHTML = likeCountMessage(like.like_count)
+    } else{
+        likeButton.innerHTML = '<i class="bi bi-heart"></i> Like';
+        likeCount.innerHTML = likeCountMessage(like.like_count)
+    }
+
+}
+
+
+async function submitLikePost(postId){
+
+    try{
+
+        const request = await fetch(`${postId}/like`,{
+            method : 'POST',
+                credentials : 'same-origin',
+                headers : {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken' : getCookie("csrftoken"),
+                    'Content-Type': 'application/json'
+                }
+        })
+
+        if(request.ok){
+            return await request.json()
+        }
+
+    } catch(error){
+        console.log(error);
+    }
+}
+
+
+function editPost(event, footerCol, editButton, likeButton, likeCount){
 
     // Getting the post content.
     const post_body = getPostBody(event);
@@ -313,7 +373,7 @@ function editPost(event, footerCol, editButton){
         post_body.innerHTML = "";
         post_body.innerHTML = post_body_copy;
 
-        resetEditPost(submit_button, reset_button, footerCol, editButton)
+        resetEditPost(submit_button, reset_button, footerCol, editButton, likeButton, likeCount)
     })
 
     // Adding a eventlistner to submit button
@@ -329,7 +389,7 @@ function editPost(event, footerCol, editButton){
             post_body.innerHTML = edit_post.content;
 
             // Resetting the view
-            resetEditPost(submit_button, reset_button, footerCol, editButton)
+            resetEditPost(submit_button, reset_button, footerCol, editButton, likeButton, likeCount)
         }
     })
 
@@ -338,16 +398,22 @@ function editPost(event, footerCol, editButton){
     footerCol.append(reset_button, submit_button);
 
     // Removing the edit button when user click on it
+    likeCount.remove();
+    likeButton.remove();
     editButton.remove();
 
 }
 
-function resetEditPost(submit_button, reset_button, footerCol, editButton){
+
+function resetEditPost(submit_button, reset_button, footerCol, editButton, likeButton, likeCount){
     submit_button.remove();
     reset_button.remove();
+    footerCol.append(likeButton);
+    footerCol.append(likeCount);
     footerCol.append(editButton);
     footerCol.classList.remove('d-grid', 'gap-2', 'd-md-flex', 'justify-content-md-end');
 }
+
 
 async function submitEditedPost(postId, content){
 
@@ -375,6 +441,7 @@ async function submitEditedPost(postId, content){
     catch(error){
         console.log(error)
     }
+
 }
 
 
@@ -410,7 +477,6 @@ async function createPost(){
     catch(error){
         console.log(error)
     }
-
 
 }
 
