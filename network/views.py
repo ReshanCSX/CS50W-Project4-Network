@@ -9,7 +9,7 @@ import json
 from .models import User, Posts, Followers
 
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status, generics
 from rest_framework.decorators import api_view
 from .serializers import PostSerializer, UserSerializer
 from django.core.paginator import Paginator
@@ -19,6 +19,59 @@ from django.contrib.auth.decorators import login_required
 def index(request):
 
     return render(request, "network/index.html")
+
+@api_view(['POST'])
+@login_required
+def like(request, postId):
+
+    user = request.user
+
+    try:
+        post = Posts.objects.get(pk=postId)
+    except:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+    
+    if (user.likes.filter(pk=postId).exists()):
+        user.likes.remove(postId)
+        is_liked = False
+    else:
+        user.likes.add(postId)
+        is_liked = True
+
+    return Response({"is_liked": is_liked, "like_count": post.liked_by.count()}, status=status.HTTP_200_OK)
+
+
+@api_view(['PUT'])
+@login_required
+def editpost(request, id):
+    
+    try:
+        post = Posts.objects.get(pk=id)
+    except:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if post.author != request.user:
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+    
+    data = json.loads(request.body)
+
+    content = data.get('content', '')
+
+    if not content or len(content) > 1000:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+        
+
+    try:
+        post.content = content
+        post.save()
+
+        serialize = PostSerializer(post, context={'request': request})
+
+        return Response(serialize.data, status=status.HTTP_200_OK)
+    except Exception as e:
+        print(e)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+    
 
 
 @api_view(['PUT'])
@@ -90,7 +143,7 @@ def serializedata(request, posts):
     page_obj = paginator.get_page(page_number)
 
     # serializing the page object
-    serializer = PostSerializer(page_obj, many=True)
+    serializer = PostSerializer(page_obj, many=True, context={'request': request})
 
     # Adding other information
     data = {
@@ -182,7 +235,7 @@ def posts(request):
             data = request.data.copy()
             data.update({'author': request.user.id})
 
-            serializer = PostSerializer(data=data)
+            serializer = PostSerializer(data=data , context={'request': request})
 
             if serializer.is_valid():
                 serializer.save()

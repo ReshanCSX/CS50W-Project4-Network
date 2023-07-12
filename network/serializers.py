@@ -6,16 +6,27 @@ class PostSerializer(serializers.ModelSerializer):
 
     timestamp = serializers.SerializerMethodField()
     author_name = serializers.SerializerMethodField()
+    like_count = serializers.SerializerMethodField()
+    is_liked = serializers.SerializerMethodField()
     
     class Meta:
         model = Posts
-        fields = '__all__'
+        fields = ['id', 'timestamp', 'author_name', 'like_count', 'is_liked', 'content', 'author']
 
     def get_author_name(self, object):
         return object.author.username
     
     def get_timestamp(self, object):
         return naturaltime(object.timestamp)
+    
+    def get_like_count(self, object):
+        if object.liked_by.count() > 0:
+            return object.liked_by.count()
+        return False
+    
+    def get_is_liked(self, object):
+        user = self.context['request'].user
+        return object.liked_by.filter(id=user.id).exists()
     
 class UserSerializer(serializers.ModelSerializer):
 

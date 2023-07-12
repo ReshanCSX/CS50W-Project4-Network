@@ -91,7 +91,22 @@ export function generateEditButton(){
 
     edit_button.innerHTML = "Edit";
 
-    edit_button.classList.add('btn', 'badge', 'bg-dark');
+    edit_button.classList.add('btn', 'btn-link', 'btn-sm');
 
     return edit_button
+}
+
+
+export function generateLikeButton(liked){
+    const likeButton = document.createElement('button');
+
+    if (liked){
+        likeButton.innerHTML = '<i class="bi bi-heart-fill"></i> Unlike';
+    } else{
+        likeButton.innerHTML = '<i class="bi bi-heart"></i> Like';
+    }
+    
+    likeButton.classList.add('btn', 'btn-outline-danger', 'btn-sm', 'me-2');
+
+    return likeButton
 }
