@@ -97,7 +97,7 @@ def editpost(request, id):
         post.content = content
         post.save()
 
-        serialize = PostSerializer(post)
+        serialize = PostSerializer(post, context={'request': request})
 
         return Response(serialize.data, status=status.HTTP_200_OK)
     except:
