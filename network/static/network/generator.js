@@ -64,25 +64,18 @@ export function generateProfile(content){
 }
 
 export function generateFollow(content){
+    const followButton = document.createElement('button');
+    followButton.id = "follow_button"
 
-    const followSection = document.createElement("div");
+    if (content.is_follower){
+        followButton.innerHTML = "Unfollow";
+        followButton.classList.add('btn', 'btn-danger');
+    } else{
+        followButton.innerHTML = "Follow";
+        followButton.classList.add('btn', 'btn-primary')
+    }
 
-    followSection.innerHTML = `${(
-                                    () => {
-                                        if(content.is_follower){
-                                            return `<button class="btn btn-danger" id="follow_button">Unfollow</button>`
-                                        
-                                        } else{
-                                            return `<button class="btn btn-primary" id="follow_button">Follow</button>`
-                                        
-                                        }
-                                    })()
-                                }`
-
-    
-    followSection.classList.add("col");
-
-    return followSection
+    return followButton
 }
 
 
