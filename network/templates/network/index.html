@@ -2,25 +2,66 @@
 {% load static %}
 
 {% block body %}
-    {% if user.is_authenticated %}
-    <div class="row p-3 bg-white justify-content-center">
-        <div class="col-12 col-md-10 col-lg-8 text-center align-self-center border rounded">
-            <h4 class="my-3">New Post</h4>
-            <textarea class="form-control mb-3" rows="3" id="post_content"></textarea>
-            <button type="submit" class="btn btn-primary mb-3 float-end" id="create_post">Post</button>
-        </div>
-    </div>
-    {% endif %}
 
-    <div class="row">
-        <div class="col" id="posts">
-            
+    <div class="container" id="home-view">
+        {% if user.is_authenticated %}
+        <div class="row p-3 bg-white justify-content-center">
+            <div class="col-12 col-md-10 col-lg-8 text-center align-self-center border rounded">
+                <h4 class="my-3">New Post</h4>
+                <textarea class="form-control mb-3" rows="3" id="post_content"></textarea>
+                <button type="submit" class="btn btn-primary mb-3 float-end" id="create_post">Post</button>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+
+    <div class="container" id="following-view">
+        
+    </div>
+
+
+    <div class="container" id="profile-view">
+       
+    </div>
+
+
+    <div class="container">
+        <!-- Posts -->
+        <div class="row">
+            <div class="col" id="posts">
+            </div>
+        </div>
+
+        <!-- Paginator -->
+        <div class="row">
+            <div class="col">
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" id="previous_page">
+                            <a class="page-link" id="paginator-previous" href="#" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+
+                        <li class="page-item"><a class="page-link paginator-num" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link paginator-num" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link paginator-num" href="#">1</a></li>
+
+                        <li class="page-item" id="next_page">
+                            <a class="page-link" id="paginator-next" href="#" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
         </div>
     </div>
 {% endblock %}
 
 {% block script %}
-    {% if user.is_authenticated %}
-        <script src="{% static 'network/main.js' %}" type="module"></script>
-    {% endif %}
+
+    <script src="{% static 'network/main.js' %}" type="module"></script>
+
 {% endblock %}
