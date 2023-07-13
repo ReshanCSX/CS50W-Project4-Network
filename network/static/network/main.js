@@ -154,12 +154,14 @@ async function loadProfile(id){
             follow_section.append(followButton);
             profile_section.append(follow_section);
             
-            // Event listner for followbutton
+            // Event listner for followButton
             followButton.addEventListener('click', () =>{
                 
                 follow(response.id, response.is_follower ? "unfollow" : "follow")
 
             });
+
+            profile_section.append(followButton);
             
         }
 
