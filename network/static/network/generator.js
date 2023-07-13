@@ -101,7 +101,7 @@ export function generateLikeButton(liked){
     const likeButton = document.createElement('button');
 
     if (liked){
-        likeButton.innerHTML = '<i class="bi bi-heart-fill"></i> Unlike';
+        likeButton.innerHTML = '<i class="bi bi-heart-fill"></i> Dislike';
     } else{
         likeButton.innerHTML = '<i class="bi bi-heart"></i> Like';
     }

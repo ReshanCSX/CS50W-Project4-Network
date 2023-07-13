@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelector("#paginator-previous").addEventListener("click", () => {
 
         const url = getURL(CURRENT_PAGE_NUMBER - 1, getId())
-
+        
         loadPosts(url);
     })
 
@@ -143,13 +143,12 @@ async function loadProfile(id){
             let profile_section = document.querySelector("#follow_section");
             const followButton = generateFollow(response);
             
-            profile_section.append(followButton);
-
-
             followButton.addEventListener('click', () =>{
                 
                 follow(response.id, response.is_follower ? "unfollow" : "follow")
             });
+
+            profile_section.append(followButton);
             
         }
 
@@ -217,18 +216,8 @@ async function loadPosts(url){
             addPostsToDOM(content, requested_by);
         });
 
-
-        // Adding event listners to usernames
-        document.querySelectorAll(".username")?.forEach(username => {
-            username.addEventListener('click', event => {
-                const user_id = event.target.dataset.id;
-                loadView('profile', user_id);
-            });
-        });
-
-
         // Update paginator numbers
-        updatePaginator(response.paginator);
+        updatePaginator(response.paginator);        
 
 
         // Update globle variables
@@ -246,6 +235,12 @@ function addPostsToDOM(content, requested_by){
     const post_section = document.querySelector('#posts');
 
     const post = generatePost(content);
+
+    post.querySelector(".username").addEventListener('click', event => {
+        const userID = event.target.dataset.id;
+        loadView('profile', userID);
+    })
+
 
     // Check if the user is authenticated
     if (requested_by){
@@ -305,7 +300,7 @@ async function likePost(event, likeButton, likeCount){
     
     // Changing like button
     if(like.is_liked){
-        likeButton.innerHTML = '<i class="bi bi-heart-fill"></i> Unlike'
+        likeButton.innerHTML = '<i class="bi bi-heart-fill"></i> Dislike'
         likeCount.innerHTML = likeCountMessage(like.like_count)
     } else{
         likeButton.innerHTML = '<i class="bi bi-heart"></i> Like';
