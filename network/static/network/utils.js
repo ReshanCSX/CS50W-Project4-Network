@@ -86,11 +86,11 @@ export function likeCountMessage(count) {
     let message
 
     if(count > 1){
-        message = `${count} Likes.`;
+        message = `${count} Likes`;
     } else if(count == 1){
-        message = `${count} Like.`;
+        message = `${count} Like`;
     } else {
-        message = "Be the first one to like this.";
+        message = "Be the first one to like this";
     }
 
     return message

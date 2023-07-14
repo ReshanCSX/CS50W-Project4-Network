@@ -2,3 +2,40 @@
     resize: none;
 }
 
+.likeButton, .editButton{
+    border: none;
+    background-color: transparent;
+    transition: 0.3s;
+}
+
+.likeButton{
+    color:#e74c3c;
+    border-radius: 10px;
+}
+
+.likeButton:hover{
+    background-color: #e74c3c;
+    color: #FFFFFF;
+}
+
+.editButton{
+    color: #292929;
+    border-radius: 12px;
+}
+
+.editButton:hover{
+    background-color: #292929;
+    color:#FFFFFF;
+}
+
+hr{
+    margin: 0.5rem;
+    color: #a7a7a7;
+}
+
+.username{
+    text-decoration: none;
+}
+
+
+

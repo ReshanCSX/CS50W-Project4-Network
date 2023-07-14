@@ -161,7 +161,6 @@ async function loadProfile(id){
 
             });
 
-            profile_section.append(followButton);
             
         }
 
@@ -263,9 +262,10 @@ function addPostsToDOM(content, requested_by){
         const footerCol = document.createElement('div');
         const likeCount = document.createElement("span");
 
-        footerSection.classList.add('row', 'mb-2');
+        footerSection.classList.add('row', 'mb-1');
+        footerSection.innerHTML = "<hr>";
         footerCol.classList.add('col');
-        likeCount.classList.add('small', 'text-muted');
+        likeCount.classList.add('small', 'text-muted', 'me-2');
         
         footerSection.append(footerCol);
         
