@@ -140,15 +140,27 @@ async function loadProfile(id){
         // Generating follow button
 
         if (response.id !== response.requested_by && response.requested_by !== null){
-            let profile_section = document.querySelector("#follow_section");
+
+            const profile_section = document.querySelector("#follow_section");
+
+            // Follow button Section
+            const follow_section = document.createElement('div');
+            follow_section.classList.add('col');
+
+            // Generating follow Button
             const followButton = generateFollow(response);
+
+            // Adding follow button and section to DOM
+            follow_section.append(followButton);
+            profile_section.append(follow_section);
             
+            // Event listner for followButton
             followButton.addEventListener('click', () =>{
                 
                 follow(response.id, response.is_follower ? "unfollow" : "follow")
+
             });
 
-            profile_section.append(followButton);
             
         }
 
@@ -250,9 +262,10 @@ function addPostsToDOM(content, requested_by){
         const footerCol = document.createElement('div');
         const likeCount = document.createElement("span");
 
-        footerSection.classList.add('row', 'mb-2');
+        footerSection.classList.add('row', 'mb-1');
+        footerSection.innerHTML = "<hr>";
         footerCol.classList.add('col');
-        likeCount.classList.add('small', 'text-muted');
+        likeCount.classList.add('small', 'text-muted', 'me-2');
         
         footerSection.append(footerCol);
         

@@ -6,10 +6,10 @@ export function generatePost(content){
         <div class="container-fluid p-3 post_container">
 
             <div class="row mb-3">
-                <div class="col-auto small"><a href="#" data-id="${content.author}" class="username">@${content.author_name}</a></div>
-                <div class="col-auto small text-muted">${content.timestamp}</div>
+                <div class="col-6 small"><a href="#" data-id="${content.author}" class="username">${content.author_name}</a></div>
+                <div class="col-6 text-end small text-muted">${content.timestamp}</div>
             </div>
-            <div class="row mb-2">
+            <div class="row mb-3">
                 <div class="col post_body" id="${content.id}">${content.content}</div>
             </div> 
         </div>
@@ -64,25 +64,18 @@ export function generateProfile(content){
 }
 
 export function generateFollow(content){
+    const followButton = document.createElement('button');
+    followButton.id = "follow_button"
 
-    const followSection = document.createElement("div");
+    if (content.is_follower){
+        followButton.innerHTML = "Unfollow";
+        followButton.classList.add('btn', 'btn-danger');
+    } else{
+        followButton.innerHTML = "Follow";
+        followButton.classList.add('btn', 'btn-primary')
+    }
 
-    followSection.innerHTML = `${(
-                                    () => {
-                                        if(content.is_follower){
-                                            return `<button class="btn btn-danger" id="follow_button">Unfollow</button>`
-                                        
-                                        } else{
-                                            return `<button class="btn btn-primary" id="follow_button">Follow</button>`
-                                        
-                                        }
-                                    })()
-                                }`
-
-    
-    followSection.classList.add("col");
-
-    return followSection
+    return followButton
 }
 
 
@@ -91,7 +84,7 @@ export function generateEditButton(){
 
     edit_button.innerHTML = "Edit";
 
-    edit_button.classList.add('btn', 'btn-link', 'btn-sm');
+    edit_button.classList.add('editButton', 'small');
 
     return edit_button
 }
@@ -106,7 +99,7 @@ export function generateLikeButton(liked){
         likeButton.innerHTML = '<i class="bi bi-heart"></i> Like';
     }
     
-    likeButton.classList.add('btn', 'btn-outline-danger', 'btn-sm', 'me-2');
+    likeButton.classList.add('likeButton', 'me-2', 'small');
 
     return likeButton
 }
