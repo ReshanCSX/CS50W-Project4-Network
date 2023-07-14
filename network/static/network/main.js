@@ -225,7 +225,7 @@ async function loadPosts(url){
 
         // Appending posts
         response.serializer.forEach(content => {
-            addPostsToDOM(content, requested_by);
+            addPostsToDOM(content, requested_by, "end");
         });
 
         // Update paginator numbers
@@ -242,7 +242,7 @@ async function loadPosts(url){
 
 }
 
-function addPostsToDOM(content, requested_by){
+function addPostsToDOM(content, requested_by, position){
 
     const post_section = document.querySelector('#posts');
 
@@ -273,8 +273,7 @@ function addPostsToDOM(content, requested_by){
         let likeButton = generateLikeButton(content.is_liked);
         likeCount.innerHTML = likeCountMessage(content.like_count);
 
-        footerCol.append(likeButton);
-        footerCol.append(likeCount);
+        footerCol.append(likeButton, likeCount);
 
         // Eventlistner for like button
         likeButton.addEventListener('click', event => likePost(event.target, likeButton, likeCount))
@@ -298,7 +297,15 @@ function addPostsToDOM(content, requested_by){
     }
 
     // Appending the post to post section
-    post_section.append(post);
+    if (position === "end"){
+        post_section.append(post);
+
+    } else if (position === "start"){
+        post.style.animationName = 'fade-in';
+        post.style.animationDuration = '1s';
+        post_section.prepend(post);
+    }
+    
 }
 
 
@@ -420,9 +427,7 @@ function editPost(event, footerCol, editButton, likeButton, likeCount){
 function resetEditPost(submit_button, reset_button, footerCol, editButton, likeButton, likeCount){
     submit_button.remove();
     reset_button.remove();
-    footerCol.append(likeButton);
-    footerCol.append(likeCount);
-    footerCol.append(editButton);
+    footerCol.append(likeButton, likeCount, editButton);
     footerCol.classList.remove('d-grid', 'gap-2', 'd-md-flex', 'justify-content-md-end');
 }
 
@@ -479,11 +484,12 @@ async function createPost(){
 
         });
 
-        // FURTHER DEVELOPMENT
-        const response = await request.json();
-
         content.value = "";
-        loadView("index");
+
+        if (request.ok){
+            const response = await request.json();
+            addPostsToDOM(response.serializer, response.requested_by, "start")
+        }
 
     }
     catch(error){

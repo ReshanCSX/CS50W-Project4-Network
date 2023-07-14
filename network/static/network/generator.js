@@ -15,7 +15,7 @@ export function generatePost(content){
         </div>
     </div>
     `
-    container.classList.add("row", "p-3", "bg-white", "justify-content-center");
+    container.classList.add("row", "p-3", "bg-white", "justify-content-center", "post_div");
 
     return container
 }
