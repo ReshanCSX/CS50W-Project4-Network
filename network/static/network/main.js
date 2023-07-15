@@ -1,6 +1,3 @@
-
-
-
 import { alert, getCookie, getCurrentView, getURL, getId, getPostBody, likeCountMessage} from './utils.js';
 import { generatePost, generateProfile, generateFollow, generateEditButton, generateLikeButton } from './generator.js';
 
@@ -9,7 +6,7 @@ let CURRENT_PAGE_NUMBER = 1;
 
 
 document.addEventListener('DOMContentLoaded', () => {
-    document.querySelector("#index").addEventListener('click', () => loadView("index"));
+    document.querySelector("#index").addEventListener('click', event => {event.preventDefault(), loadView("index")});
     document.querySelector("#create_post")?.addEventListener('click', () => createPost());
     document.querySelector("#following")?.addEventListener('click', () => loadView("following"));
 
