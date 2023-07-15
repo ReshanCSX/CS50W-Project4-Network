@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.http import JsonResponse
 import json
@@ -273,6 +273,11 @@ def login_view(request):
         # Check if authentication successful
         if user is not None:
             login(request, user)
+            # Redirect user
+            if 'next' in request.POST:
+                return redirect(request.POST.get('next'))
+            else:
+                return redirect(reverse("index"))
             return HttpResponseRedirect(reverse("index"))
         else:
             return render(request, "network/login.html", {
