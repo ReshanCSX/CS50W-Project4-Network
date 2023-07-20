@@ -1,5 +1,5 @@
 import { alert, getCookie, getCurrentView, getURL, getId, getPostBody, likeCountMessage} from './utils.js';
-import { generatePost, generateProfile, generateFollow, generateEditButton, generateLikeButton } from './generator.js';
+import { generatePost, generateProfile, generateFollow, generateEditButton, generateLikeButton, generatePaginator} from './generator.js';
 
 
 let CURRENT_PAGE_NUMBER = 1;
@@ -9,36 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelector("#index").addEventListener('click', event => {event.preventDefault(), loadView("index")});
     document.querySelector("#create_post")?.addEventListener('click', () => createPost());
     document.querySelector("#following")?.addEventListener('click', () => loadView("following"));
-
-
-    // Paginator page number eventlistner
-    document.querySelectorAll(".paginator-num").forEach(number => {
-
-        number.addEventListener("click", event => {
-
-
-            let url = getURL(event.target.innerHTML, getId());
-         
-            loadPosts(url);
-
-        })
-    })
-
-    // Paginator previous button eventlistner
-    document.querySelector("#paginator-previous").addEventListener("click", () => {
-
-        const url = getURL(CURRENT_PAGE_NUMBER - 1, getId())
-        
-        loadPosts(url);
-    })
-
-    // Paginator next button eventlistner
-    document.querySelector("#paginator-next").addEventListener("click", () => {
-
-        const url = getURL(CURRENT_PAGE_NUMBER + 1, getId())
-        
-        loadPosts(url);
-    })
 
 
     // Load profile page when clicked on nav bar link
@@ -204,33 +174,33 @@ async function follow(id, action){
 async function loadPosts(url){
 
     document.querySelector("#posts").innerHTML = "";
+    document.querySelector("#paginator").innerHTML = "";
 
 
     try{
         const request = await fetch(url);
         const response = await request.json();
+        
+        console.log(Object.keys(response.serializer));
 
-        if(response.paginator.has_next == false){
-            document.querySelector("#previous_page").classList.add("disabled");
+        if(!Object.keys(response.serializer).length == 0){
+
+            const requested_by = response.requested_by;
+
+            // Appending posts
+            response.serializer.forEach(content => {
+                addPostsToDOM(content, requested_by, "end");
+            });
+
+            // Update paginator numbers
+            updatePaginator(response.paginator);        
+
+
+            // Update globle variables
+            CURRENT_PAGE_NUMBER = parseInt(response.paginator.page_number);
+        } else{
+            document.querySelector('#posts').innerHTML = "<h3 class='text-muted mt-5 text-center'>No posts yet.<h3>";
         }
-
-        if(response.paginator.has_next == false){
-            document.querySelector("#next_page").classList.add("disabled");
-        }
-
-        const requested_by = response.requested_by;
-
-        // Appending posts
-        response.serializer.forEach(content => {
-            addPostsToDOM(content, requested_by, "end");
-        });
-
-        // Update paginator numbers
-        updatePaginator(response.paginator);        
-
-
-        // Update globle variables
-        CURRENT_PAGE_NUMBER = parseInt(response.paginator.page_number);
 
     }
     catch(error){
@@ -498,38 +468,35 @@ async function createPost(){
 
 function updatePaginator(data){
 
-    const pages = data.page_count;
-    let current_page = data.page_number;
 
-    // Enable or disable nextpage button 
-    if (!data.has_next){
-        document.querySelector("#next_page").classList.add("disabled");
+    // Setting up the paginator
+    const paginatorSection = document.querySelector('#paginator');
+
+
+    const paginator = generatePaginator(data);
+    
+    if(data.has_previous){
+        paginator.querySelector('#previous_page').classList.remove('disabled')
+
+        paginator.querySelector("#previous_page").addEventListener("click", () => {
+
+            const url = getURL(CURRENT_PAGE_NUMBER - 1, getId())
+            
+            loadPosts(url);
+        })
     }
-    else{
-        document.querySelector("#next_page").classList.remove("disabled");
+    if(data.has_next){
+        paginator.querySelector('#next_page').classList.remove('disabled')
+
+        paginator.querySelector("#next_page").addEventListener("click", () => {
+
+            const url = getURL(CURRENT_PAGE_NUMBER + 1, getId())
+            
+            loadPosts(url);
+        })
     }
 
-    // Enable or disable previous page button
-    if(!data.has_previous){
-        document.querySelector("#previous_page").classList.add("disabled");
-    }
-    else{
-        document.querySelector("#previous_page").classList.remove("disabled");
-    }
-
-    // Setting each page numbers
-    document.querySelectorAll(".paginator-num").forEach(paginator_item => {
-
-        paginator_item.parentNode.classList.remove("disabled");
-
-        paginator_item.innerHTML = current_page;
-
-        if (current_page > pages){
-            paginator_item.parentNode.classList.add("disabled");
-        }
-
-        current_page++;
-    });
+    paginatorSection.append(paginator); 
 
 }
 
