@@ -65,7 +65,7 @@ export function generateProfile(content){
 
 export function generateFollow(content){
     const followButton = document.createElement('button');
-    followButton.id = "follow_button"
+    followButton.id = "follow_button";
 
     if (content.is_follower){
         followButton.innerHTML = "Unfollow";
@@ -102,4 +102,28 @@ export function generateLikeButton(liked){
     likeButton.classList.add('likeButton', 'me-2', 'small');
 
     return likeButton
+}
+
+export function generatePaginator(data){
+
+    const paginator = document.createElement('nav');
+
+    paginator.innerHTML = `
+    
+        <ul class="pagination justify-content-center">
+            <li class="page-item disabled" id="previous_page">
+                <a class="page-link" id="paginator-previous" href="#" aria-label="Previous">
+                <span aria-hidden="true">Previous</span>
+                </a>
+            </li>
+
+            <li class="page-item disabled" id="next_page">
+                <a class="page-link" id="paginator-next" href="#" aria-label="Next">
+                <span aria-hidden="true">Next</span>
+                </a>
+            </li>
+        </ul>
+    
+    `
+    return paginator
 }

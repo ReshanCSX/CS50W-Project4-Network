@@ -151,8 +151,7 @@ def serializedata(request, posts):
         "paginator": {
             "has_previous" : page_obj.has_previous(),
             "has_next" : page_obj.has_next(),
-            "page_number" : page_number,
-            "page_count" : paginator.num_pages
+            "page_number" : page_number
         },
         "serializer" : serializer.data
     }
